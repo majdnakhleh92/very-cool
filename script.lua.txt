@@ -12,7 +12,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 		task.wait(2)
 		print(3)
 		
-		local url = "https://pastebin.com/raw/fpkbJgyq"
+		local url = "https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script.lua.txt"
 		local StarterGui = game:GetService("StarterGui")
 		local SoundService = game:GetService("SoundService")
  
@@ -396,4 +396,5 @@ else
 		print("yaaaaaaaaaaaaaaaaaaaaa")
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
+
 end
