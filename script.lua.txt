@@ -42,13 +42,6 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 			sound.Looped = false
 			sound.Parent = SoundService
 			sound:Play()
-			task.wait(3)
-			
-			local s = game:HttpGet(url)
-			print(s)
-			
-			warn(g)
-			
 		end
  
 		print(4)
@@ -398,3 +391,4 @@ else
 	end
 
 end
+
