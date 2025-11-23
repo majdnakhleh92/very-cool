@@ -101,15 +101,10 @@ local function DiscordNotificationCURRENCY(txtlbl)
 	return
 end
 
-local function DiscordNotificationNAME(txtlbl)
+local function DiscordNotificationNAME(PP: ProximityPrompt)
 	print("generating response")
-	local ovrhead = txtlbl.Parent
-	local Plot = ovrhead.Parent.Parent.Parent.Parent.Parent.Parent
-	local plotSignTextLabel = Plot.PlotSign.SurfaceGui.Frame.TextLabel
-	local Owner = GetPlayerNameFromLabel(plotSignTextLabel)
 
-	local DisplayName = ovrhead:FindFirstChild("DisplayName")
-	local gen = ovrhead:FindFirstChild("Generation")
+	local DisplayName = PP 
 
 	local myMessage = webhookUtil.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
@@ -117,9 +112,8 @@ local function DiscordNotificationNAME(txtlbl)
 		content = "A good server found by: " .. game.Players.LocalPlayer.Name
 	})
 
-	local embed1 = myMessage.addEmbed(DisplayName.Text, 0x57F287, gen.Text)
+	local embed1 = myMessage.addEmbed(PP.ObjectText, 0x57F287, "brainrot found by name")
 
-	embed1.addField("Player's Name", Owner.Name, false)
 	embed1.addField("Server Id", game.JobId, false)
 
 	myMessage.sendMessage()
@@ -172,38 +166,28 @@ local function GetMostValuable(strings, minimum)
 end
 
 local function CheckNames() 
-	local textLabelCount = 0
 	local nameMatch = nil
 	local PLR = nil
-
 
 	for _, plot in pairs(game.Workspace.Plots:GetChildren()) do
 		if plot and plot:GetAttribute("Tier") > 0 then
 			local animalpod = plot:FindFirstChild("AnimalPodiums")
 			if animalpod then
-				for _, model in pairs(animalpod:GetChildren()) do
-					local base = model:FindFirstChild("Base")
-					if base then
-						local spn = base:FindFirstChild("Spawn")
-						if spn then
-							local attachment = spn:FindFirstChild("Attachment")
-							if attachment then
-								local ovrhead = attachment:FindFirstChild("AnimalOverhead")
-								if ovrhead then
-									local DisplayName = ovrhead:FindFirstChild("DisplayName")
-									if DisplayName then
-										textLabelCount = textLabelCount + 1
+				for _, podium in pairs(animalpod:GetChildren()) do
+					local attachment = podium.Base.Spawn:FindFirstChild("PromptAttachment")
+					if attachment then
+						for _, PP: ProximityPrompt in pairs(attachment:GetChildren()) do
+							if PP:IsA("ProximityPrompt") then
+								if PP.ObjectText ~= "" then
 
-										for _, name in ipairs(Names) do
-											if DisplayName.Text == name then
-												nameMatch = DisplayName
-												print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
-												break
-											end
-										end
-										if not nameMatch or DisplayName.Text ~= nameMatch then
-											local namesStr = table.concat(Names, ", ")
-										end
+									if table.find(Names, PP.ObjectText) then
+										nameMatch = PP
+										print("Found matching DisplayName TextLabel: " .. PP.ObjectText)
+										break
+									end
+
+									if not nameMatch or PP.ObjectText ~= nameMatch then
+										local namesStr = table.concat(Names, ", ")
 									end
 								end
 							end
@@ -270,11 +254,11 @@ if meetsMinimum then
 	sound.Looped = false
 	sound.Parent = game.SoundService 
 	sound:Play()
-
+	
 	task.spawn(function()
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"))()
 	end)
-
+	
 	DiscordNotificationCURRENCY(currencyTextLabel)
 
 elseif nameFound then
@@ -284,13 +268,13 @@ elseif nameFound then
 	sound.Volume = 1
 	sound.Looped = false
 	sound.Parent = game.SoundService 
-	sound:Play() 
+	sound:Play()
+	
 	task.spawn(function()
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"))()
 	end)
-
+	
 	DiscordNotificationNAME(matchedName)
-
 else
 	local Tried
 	local API, HttpService, TeleportService, CoreGui = nil, game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
@@ -389,15 +373,4 @@ else
 		print("yaaaaaaaaaaaaaaaaaaaaa")
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
-
 end
-
-
-
-
-
-
-
-
-
-
