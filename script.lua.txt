@@ -22,7 +22,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 		local StarterGui = game:GetService("StarterGui")
 		local SoundService = game:GetService("SoundService")
 
-		local AmountOfTries = 5
+		local AmountOfTries = 10
 
 		local success, errorMessage
 		for i = 1, AmountOfTries do
@@ -392,4 +392,5 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
