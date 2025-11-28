@@ -34,7 +34,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 				print("script loaded after " .. i .. " times")
 				break
 			else
-				warn("failed " .. i .. " times")
+				warn("failed " .. i .. " times", errorMessage)
 				task.wait(3)
 			end
 		end
@@ -392,5 +392,6 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
