@@ -1,57 +1,63 @@
 local queue_on_teleport = queue_on_teleport
 local webhookUtil = loadstring(game:HttpGet("https://raw.githubusercontent.com/idonthaveoneatm/lua/normal/discordwebhook/src.lua"))()
 
-print("script started")
+print("belly buttonnnnnnnn")
 game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 	if state ~= Enum.TeleportState.Started and state ~= Enum.TeleportState.InProgress then return end
-	
+
 	queue_on_teleport([[
-		print("queue on teleport began")
-		
-		repeat task.wait() until game:IsLoaded()
-		
-		print("game:isloaded true")
-		
+		print(1) -- rlly hope this doesnt break bro
+
+		repeat
+			task.wait()
+		until game:IsLoaded() and game.Players.LocalPlayer and game.Players.LocalPlayer.Character
+
+		print(2)
+
 		task.wait(2)
-		
-		print("waited 2 seconds")
-		
+
+		print(3)
+
 		local url = "https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script.lua.txt"
 		local StarterGui = game:GetService("StarterGui")
 		local SoundService = game:GetService("SoundService")
- 
-		local success, result = pcall(function()
-			print("first try")
-			loadstring(game:HttpGet(url))()
-		end)
- 
-		local v, g = pcall(function()
-			if not success then
-			
-				task.wait(3)
-				print("second try")
 
+		local AmountOfTries = 3
+
+		local success, errorMessage
+		for i = 1, AmountOfTries do
+			success, errorMessage = pcall(function()
 				loadstring(game:HttpGet(url))()
+			end)
+
+			if success then
+				print("script loaded after " .. i .. " times")
+				break
+			else
+				warn("failed " .. i .. " times")
+				if i < AmountOfTries then
+					task.wait(3)
+				end
 			end
-		end)
- 
-		if not v then
+		end
+
+		if not success then
+			warn("Completely failed to load the script after " .. AmountOfTries .. " attempts")
+			
 			StarterGui:SetCore("SendNotification", {
 				Title = "SOMETHING WENT WRONG!!!",
-				Text = "somethingwentwrong",
+				Text = "re-execute the script",
 				Duration = 5
 			})
- 
+
 			local sound = Instance.new("Sound")
 			sound.SoundId = "rbxassetid://4881487887"
 			sound.Volume = 0.5
 			sound.Looped = false
 			sound.Parent = SoundService
 			sound:Play()
-			print("failed")
+			
 		end
- 
-		print("teleport on queue ended")
     ]])
 end)
 
@@ -108,18 +114,18 @@ local function DiscordNotificationCURRENCY(txtlbl)
 	return
 end
 
-local function DiscordNotificationNAME(PP: ProximityPrompt)
+local function DiscordNotificationNAME(PP)
 	print("generating response")
 
-	local DisplayName = PP 
+	local DisplayName = PP
 
 	local myMessage = webhookUtil.createMessage({
-		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
+		Url = "https://discord.com/api/webhooks/1432328788145864785/h7qzlY3KbF240U0LbQoij70BdpWQLkTpjecz5mtiy4-9eeoyqN7ZFyoxUlQkexnAioei",
 		username = "Script Logs",
 		content = "A good server found by: " .. game.Players.LocalPlayer.Name
 	})
 
-	local embed1 = myMessage.addEmbed(PP.ObjectText, 0x57F287, "brainrot found by name")
+	local embed1 = myMessage.addEmbed(DisplayName.Text, 0x57F287, "brainrot found by name")
 
 	embed1.addField("Server Id", game.JobId, false)
 
@@ -127,7 +133,7 @@ local function DiscordNotificationNAME(PP: ProximityPrompt)
 	return
 end
 
-local Names = {"67", "Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos"}
+local Names = {"67", "Chicleteira Bicicleteira", "Chicleteirina Bicicleteirina", "Los Chicleteiras", "Rang Ring Bus", "Los Quesadillas", "Cuadramat and Pakrahmatmamat", "Los Burritos"}
 
 local function GetMostValuable(strings, minimum)
 	local bestValue = -math.huge
@@ -176,26 +182,25 @@ local function CheckNames()
 	local nameMatch = nil
 	local PLR = nil
 
+
 	for _, plot in pairs(game.Workspace.Plots:GetChildren()) do
 		if plot and plot:GetAttribute("Tier") > 0 then
 			local animalpod = plot:FindFirstChild("AnimalPodiums")
 			if animalpod then
-				for _, podium in pairs(animalpod:GetChildren()) do
-					local attachment = podium.Base.Spawn:FindFirstChild("PromptAttachment")
-					if attachment then
-						for _, PP: ProximityPrompt in pairs(attachment:GetChildren()) do
-							if PP:IsA("ProximityPrompt") then
-								if PP.ObjectText ~= "" then
+				local attachment = animalpod.Base.Spawn:FindFirstChild("PromptAttachment")
+				if attachment then
+					for _, PP: ProximityPrompt in pairs(attachment:GetChildren()) do
+						if PP:IsA("ProximityPrompt") then
+							if PP.ObjectText ~= "" then
 
-									if table.find(Names, PP.ObjectText) then
-										nameMatch = PP
-										print("Found matching DisplayName TextLabel: " .. PP.ObjectText)
-										break
-									end
+								if table.find(Names, PP.ObjectText) then
+									nameMatch = PP
+									print("Found matching DisplayName TextLabel: " .. PP.ObjectText)
+									break
+								end
 
-									if not nameMatch or PP.ObjectText ~= nameMatch then
-										local namesStr = table.concat(Names, ", ")
-									end
+								if not nameMatch or PP.ObjectText ~= nameMatch then
+									local namesStr = table.concat(Names, ", ")
 								end
 							end
 						end
@@ -263,10 +268,7 @@ if meetsMinimum then
 	sound:Play()
 
 	task.spawn(function()
-		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/53325754de16c11fbf8bf78101c1c881.lua"))()
-	end)
-	task.spawn(function()
-		loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"))()
 	end)
 
 	DiscordNotificationCURRENCY(currencyTextLabel)
@@ -279,16 +281,12 @@ elseif nameFound then
 	sound.Looped = false
 	sound.Parent = game.SoundService 
 	sound:Play()
-
 	task.spawn(function()
-		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/53325754de16c11fbf8bf78101c1c881.lua"))()
-		loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
-	end)
-	task.spawn(function()
-		loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"))()
 	end)
 
 	DiscordNotificationNAME(matchedName)
+
 else
 	local Tried
 	local API, HttpService, TeleportService, CoreGui = nil, game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
