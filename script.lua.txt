@@ -21,8 +21,29 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 		local url = "https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script.lua.txt"
 		local StarterGui = game:GetService("StarterGui")
 		local SoundService = game:GetService("SoundService")
+		
+		local success, errorMessage = pcall(function()
+		
+			loadstring(game:HttpGet(url))()
+		
+		end)
+		
+		if not success then
+			
+			StarterGui:SetCore("SendNotification", {
+				Title = "SOMETHING WENT WRONG!!!",
+				Text = "re-execute the script",
+				Duration = 5
+			})
 
-		loadstring(game:HttpGet(url))()
+			local sound = Instance.new("Sound")
+			sound.SoundId = "rbxassetid://4881487887"
+			sound.Volume = 0.5
+			sound.Looped = false
+			sound.Parent = SoundService
+			sound:Play()
+			
+		end
     ]])
 end)
 
