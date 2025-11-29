@@ -1,3 +1,5 @@
+if not game:IsLoaded() then game.Loaded:Wait() end
+
 local queue_on_teleport = queue_on_teleport
 local webhookUtil = loadstring(game:HttpGet("https://raw.githubusercontent.com/idonthaveoneatm/lua/normal/discordwebhook/src.lua"))()
 
@@ -6,13 +8,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 	if state ~= Enum.TeleportState.Started and state ~= Enum.TeleportState.InProgress then return end
 
 	queue_on_teleport([[
-		print(1) -- rlly hope this doesnt break bro
-
-		repeat
-			task.wait()
-		until game:IsLoaded() and game.Players.LocalPlayer and game.Players.LocalPlayer.Character
-
-		print(2)
+		print(1)
 
 		task.wait(2)
 
@@ -34,8 +30,10 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 				print("script loaded after " .. i .. " times")
 				break
 			else
-				warn("failed " .. i .. " times", errorMessage)
-				task.wait(3)
+				warn("failed " .. i .. " times")
+				if i < AmountOfTries then
+					task.wait(3)
+				end
 			end
 		end
 
@@ -392,6 +390,3 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
-
-
-
