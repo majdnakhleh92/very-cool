@@ -98,7 +98,7 @@ local function DiscordNotificationNAME(PP: ProximityPrompt)
 	return
 end
 
-local Names = {"67", "Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos", "Matteo", "Sammyni Spyderini", "Bombardiro Crocodilo"}
+local Names = {"67", "Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos", "Matteo", "Sammyni Spyderini"}
 
 local function GetMostValuable(strings, minimum)
 	local bestValue = -math.huge
@@ -359,6 +359,7 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
 
