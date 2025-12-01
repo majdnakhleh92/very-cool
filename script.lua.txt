@@ -263,7 +263,7 @@ elseif nameFound then
 else
 	local Tried
 	local API, HttpService, TeleportService, CoreGui = nil, game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
-	local RemoveErrorPrompts = false
+	local RemoveErrorPrompts = true
 	local IterationSpeed = 0.35 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
 	local ExcludefullServers = false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
 	local SaveTeleportAttempts = false
@@ -326,7 +326,16 @@ else
 
 	API = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?limit=100"
 
-	if RemoveErrorPrompts then CoreGui:WaitForChild("RobloxGui"):WaitForChild("Modules"):WaitForChild("ErrorPrompt"):Destroy() CoreGui.RobloxPromptGui:Destroy() end
+	if RemoveErrorPrompts then
+		local ep = CoreGui:WaitForChild("RobloxGui"):WaitForChild("Modules"):FindFirstChild("ErrorPrompt")
+		if ep then
+			ep:Destroy()
+		end
+		
+		if CoreGui:FindFirstChild("RobloxPromptGui") then
+			CoreGui.RobloxPromptGui:Destroy()
+		end
+	end
 
 	if isfile("Servers.JSON") then
 		local success, JSONData = pcall(function()
@@ -359,14 +368,3 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
-
-
-
-
-
-
-
-
-
-
-
