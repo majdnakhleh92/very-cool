@@ -25,7 +25,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 
 		-- chatgpt :/
 		local func, err = pcall(function()
-			loadstring(game:HttpGet(url))
+			loadstring(game:HttpGet(url))()
 		end)
 		
 		if not func then
@@ -734,3 +734,4 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
