@@ -22,9 +22,19 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 		local StarterGui = game:GetService("StarterGui")
 		local SoundService = game:GetService("SoundService")
 		
-		loadstring(game:HttpGet(url))()
+		local success, error = pcall(function()
+			loadstring(game:HttpGet(url))()
+		end)
+
+		if not success then
+			warn("Error loading script " .. error)
+			
+			print(game:HttpGet(url))
+		end
     ]])
 end)
+
+
 
 local function GetPlayerNameFromLabel(textLabel)
 	if not textLabel or not textLabel:IsA("TextLabel") or not textLabel.Text then
@@ -325,7 +335,7 @@ else
 		if ep then
 			ep:Destroy()
 		end
-		
+
 		if CoreGui:FindFirstChild("RobloxPromptGui") then
 			CoreGui.RobloxPromptGui:Destroy()
 		end
@@ -362,6 +372,5 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
-
 
 
