@@ -21,17 +21,16 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 		local url = "https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script.lua.txt"
 		local StarterGui = game:GetService("StarterGui")
 		local SoundService = game:GetService("SoundService")
-		
+
 
 		-- chatgpt :/
 		local func, err = pcall(function()
 			loadstring(game:HttpGet(url))()
 		end)
-		
+
 		if not func then
 			print(err)
 			local queue_on_teleport = queue_on_teleport
-			local webhookUtil = loadstring(game:HttpGet("https://raw.githubusercontent.com/idonthaveoneatm/lua/normal/discordwebhook/src.lua"))()
 
 			local function GetPlayerNameFromLabel(textLabel)
 				if not textLabel or not textLabel:IsA("TextLabel") or not textLabel.Text then
@@ -60,49 +59,6 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 						return nil
 					end
 				end
-			end
-
-			local function DiscordNotificationCURRENCY(txtlbl)
-				local ovrhead = txtlbl.Parent
-				local Plot = ovrhead.Parent.Parent.Parent.Parent.Parent.Parent
-				local plotSignTextLabel = Plot.PlotSign.SurfaceGui.Frame.TextLabel
-				local Owner = GetPlayerNameFromLabel(plotSignTextLabel)
-
-				local DisplayName = ovrhead:FindFirstChild("DisplayName")
-				local gen = ovrhead:FindFirstChild("Generation")
-
-				local myMessage = webhookUtil.createMessage({
-					Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
-					username = "Script Logs",
-					content = "A good server found by: " .. game.Players.LocalPlayer.Name
-				})
-
-				local embed1 = myMessage.addEmbed(DisplayName.Text, 0x57F287, gen.Text)
-
-				embed1.addField("Player's Name", Owner.Name, false)
-				embed1.addField("Server Id", game.JobId, false)
-
-				myMessage.sendMessage()
-				return
-			end
-
-			local function DiscordNotificationNAME(PP: ProximityPrompt)
-				print("generating response")
-
-				local DisplayName = PP 
-
-				local myMessage = webhookUtil.createMessage({
-					Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
-					username = "Script Logs",
-					content = "A good server found by: " .. game.Players.LocalPlayer.Name
-				})
-
-				local embed1 = myMessage.addEmbed(PP.ObjectText, 0x57F287, "brainrot found by name")
-
-				embed1.addField("Server Id", game.JobId, false)
-
-				myMessage.sendMessage()
-				return
 			end
 
 			local Names = {"67", "Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos", "Sammyni Spyderini", "Secret Lucky Block"}
@@ -256,7 +212,6 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 					loadstring(game:HttpGet(mainScript))()
 				end)
 
-				DiscordNotificationCURRENCY(currencyTextLabel)
 
 			elseif nameFound then
 				print("yess we found")
@@ -271,7 +226,6 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 					loadstring(game:HttpGet(mainScript))()
 				end)
 
-				DiscordNotificationNAME(matchedName)
 			else
 				local Tried
 				local API, HttpService, TeleportService, CoreGui = nil, game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
@@ -380,7 +334,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 					game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 				end
 			end
-		    return
+			return
 		end
     ]])
 end)
@@ -734,4 +688,3 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
-
