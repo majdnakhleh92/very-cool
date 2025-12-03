@@ -24,7 +24,9 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 		
 
 		-- chatgpt :/
-		local func, err = loadstring(game:HttpGet(url))
+		local func, err = pcall(function()
+			loadstring(game:HttpGet(url))
+		end)
 		
 		if not func then
 			local queue_on_teleport = queue_on_teleport
