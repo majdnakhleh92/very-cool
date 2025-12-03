@@ -29,6 +29,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 		end)
 		
 		if not func then
+			print(err)
 			local queue_on_teleport = queue_on_teleport
 			local webhookUtil = loadstring(game:HttpGet("https://raw.githubusercontent.com/idonthaveoneatm/lua/normal/discordwebhook/src.lua"))()
 
