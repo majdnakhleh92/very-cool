@@ -22,14 +22,19 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 		local StarterGui = game:GetService("StarterGui")
 		local SoundService = game:GetService("SoundService")
 		
-		local success, error = pcall(function()
-			loadstring(game:HttpGet(url))()
-		end)
+		local src = game:HttpGet(url)
 
-		if not success then
-			warn("Error loading script " .. error)
-			
-			print(game:HttpGet(url))
+		-- chatgpt :/
+		local func, err = loadstring(src, "RemoteScriptChunk")
+		
+		if not func then
+		    warn("Compile error:", err)
+		    return
+		end
+		
+		local ok, runtimeErr = pcall(func)
+		if not ok then
+		    warn("Runtime error:", runtimeErr)
 		end
     ]])
 end)
@@ -372,5 +377,6 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
