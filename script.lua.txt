@@ -223,6 +223,18 @@ local function CheckCurrency(minimum)
 					end
 				end
 			end
+			for _, model: Model in pairs(plot:GetChildren()) do
+				if model:IsA("Model") then
+					for _, d in pairs(model:GetDescendants()) do
+						if d:IsA("TextLabel") then
+							if d.Name == "Generation" then
+								textLabelCount = textLabelCount + 1
+								table.insert(valuetable, d)
+							end
+						end
+					end
+				end
+			end
 		end
 	end
 
@@ -230,7 +242,6 @@ local function CheckCurrency(minimum)
 	local meetsMinimum, textlabel, amount = GetMostValuable(valuetable, minimum)
 	return meetsMinimum, amount, textlabel
 end
-
 
 local minimum = 10000000
 local nameFound, matchedName = CheckNames()
@@ -377,6 +388,3 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
-
-
-
