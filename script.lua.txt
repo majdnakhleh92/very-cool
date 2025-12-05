@@ -28,7 +28,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 
 		if not func then
 			print(err)
-			loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
+			--loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
 			
 		end
     ]])
@@ -383,3 +383,4 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
