@@ -1,5 +1,6 @@
 local queue_on_teleport = queue_on_teleport
-local webhookUtil = loadstring(game:HttpGet("https://raw.githubusercontent.com/idonthaveoneatm/lua/normal/discordwebhook/src.lua"))()
+local webhookUtil = loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
+local brainrotImages = loadstring(game:HttpGet("https://pastebin.com/raw/i0AJf9G9"))()
 
 print("script started")
 game.Players.LocalPlayer.OnTeleport:Connect(function(state)
@@ -27,9 +28,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 		end)
 
 		if not func then
-			print(err)
-			--loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
-			
+			print(err)			
 		end
     ]])
 end)
@@ -65,6 +64,13 @@ local function GetPlayerNameFromLabel(textLabel)
 	end
 end
 
+local function GetBrainrotUrl(name)
+	local brainrotImage = brainrotImages[name]
+	if brainrotImage then
+		return brainrotImage
+	end
+end
+
 local function DiscordNotificationCURRENCY(txtlbl)
 	local ovrhead = txtlbl.Parent
 	local Plot = ovrhead.Parent.Parent.Parent.Parent.Parent.Parent
@@ -80,7 +86,7 @@ local function DiscordNotificationCURRENCY(txtlbl)
 		content = "A good server found by: " .. game.Players.LocalPlayer.Name
 	})
 
-	local embed1 = myMessage.addEmbed(DisplayName.Text, 0x57F287, gen.Text)
+	local embed1 = myMessage.addEmbed(DisplayName.Text, 0x57F287, gen.Text, nil, GetBrainrotUrl(DisplayName.Text))
 
 	embed1.addField("Player's Name", Owner.Name, false)
 	embed1.addField("Server Id", game.JobId, false)
@@ -100,7 +106,7 @@ local function DiscordNotificationNAME(PP: ProximityPrompt)
 		content = "A good server found by: " .. game.Players.LocalPlayer.Name
 	})
 
-	local embed1 = myMessage.addEmbed(PP.ObjectText, 0x57F287, "brainrot found by name")
+	local embed1 = myMessage.addEmbed(PP.ObjectText, 0x57F287, "brainrot found by name", nil, GetBrainrotUrl(PP.ObjectText))
 
 	embed1.addField("Server Id", game.JobId, false)
 
@@ -383,6 +389,5 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
-
 
 
