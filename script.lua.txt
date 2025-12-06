@@ -28,7 +28,19 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 		end)
 
 		if not func then
-			print(err)			
+			print(err)
+			StarterGui:SetCore("SendNotification", {
+				Title = "SOMETHING WENT WRONG!!!",
+				Text = "somethingwentwrong",
+				Duration = 5
+			})
+ 
+			local sound = Instance.new("Sound")
+			sound.SoundId = "rbxassetid://4881487887"
+			sound.Volume = 0.5
+			sound.Looped = false
+			sound.Parent = SoundService
+			sound:Play()
 		end
     ]])
 end)
@@ -399,6 +411,7 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
 
