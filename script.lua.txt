@@ -71,9 +71,19 @@ local function GetBrainrotUrl(name)
 	end
 end
 
+local function GetPlayerPlot(any)
+	for _, plot in pairs(workspace.Plots:GetChildren()) do
+		if any:IsDescendantOf(plot) then
+			return plot
+		end
+	end
+	return
+end
+
+
 local function DiscordNotificationCURRENCY(txtlbl)
 	local ovrhead = txtlbl.Parent
-	local Plot = ovrhead.Parent.Parent.Parent.Parent.Parent.Parent
+	local Plot = GetPlayerPlot(txtlbl)
 	local plotSignTextLabel = Plot.PlotSign.SurfaceGui.Frame.TextLabel
 	local Owner = GetPlayerNameFromLabel(plotSignTextLabel)
 
@@ -389,5 +399,6 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
