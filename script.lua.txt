@@ -138,6 +138,20 @@ end
 
 local Names = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos", "Secret Lucky Block", "Orcalero Orcala", "Matteo", "Sammyni Spyderini"}
 
+local function GetAnimalOverhead()
+	local animalOverheadTable = {}
+	
+	for _, plot in pairs(workspace.Plots:GetChildren()) do
+		for _, BillboardGui: TextLabel in pairs(plot:GetDescendants()) do
+			if BillboardGui:IsA("BillboardGui") and BillboardGui.Name == "AnimalOverhead" then
+				table.insert(animalOverheadTable, BillboardGui)
+			end
+		end
+	end
+	
+	return animalOverheadTable
+end
+
 local function GetMostValuable(strings, minimum)
 	local bestValue = -math.huge
 	local bestTextLabel = nil
@@ -184,33 +198,24 @@ end
 local function CheckNames() 
 	local nameMatch = nil
 	local PLR = nil
+	
+	local AnimalOverheadTabel = GetAnimalOverhead()
+	
+	for _, overhead in pairs(AnimalOverheadTabel) do
+		local DisplayName = overhead:FindFirstChild("DisplayName")
+		local Stolen = overhead:FindFirstChild("Stolen")
+		
+		if Stolen and Stolen.Text == "Fusing" and Stolen.Visible == true then continue end
+		if not DisplayName then continue end
+		
+		if table.find(Names, DisplayName.Text) then
+			nameMatch = DisplayName
+			print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
+			break
+		end
 
-	for _, plot in pairs(game.Workspace.Plots:GetChildren()) do
-		if plot and plot:GetAttribute("Tier") > 0 then
-			local animalpod = plot:FindFirstChild("AnimalPodiums")
-			if animalpod then
-				for _, podium in pairs(animalpod:GetChildren()) do
-					local attachment = podium.Base.Spawn:FindFirstChild("PromptAttachment")
-					if attachment then
-						for _, PP: ProximityPrompt in pairs(attachment:GetChildren()) do
-							if PP:IsA("ProximityPrompt") then
-								if PP.ObjectText ~= "" then
-
-									if table.find(Names, PP.ObjectText) then
-										nameMatch = PP
-										print("Found matching DisplayName TextLabel: " .. PP.ObjectText)
-										break
-									end
-
-									if not nameMatch or PP.ObjectText ~= nameMatch then
-										local namesStr = table.concat(Names, ", ")
-									end
-								end
-							end
-						end
-					end
-				end
-			end
+		if not nameMatch or DisplayName.Text ~= nameMatch then
+			local namesStr = table.concat(Names, ", ")
 		end
 	end
 
@@ -221,44 +226,17 @@ local function CheckCurrency(minimum)
 	local valuetable = {}
 	local textLabelCount = 0
 
-
-	for _, plot in pairs(game.Workspace.Plots:GetChildren()) do
-		if plot and plot:GetAttribute("Tier") > 0 then
-			local animalpod = plot:FindFirstChild("AnimalPodiums")
-			if animalpod then
-				for _, model in pairs(animalpod:GetChildren()) do
-					local base = model:FindFirstChild("Base")
-					if base then
-						local spn = base:FindFirstChild("Spawn")
-						if spn then
-							local attachment = spn:FindFirstChild("Attachment")
-							if attachment then
-								local ovrhead = attachment:FindFirstChild("AnimalOverhead")
-								if ovrhead then
-									local gen = ovrhead:FindFirstChild("Generation")
-									if gen then
-										textLabelCount = textLabelCount + 1
-										table.insert(valuetable, gen)
-									end
-								end
-							end
-						end
-					end
-				end
-			end
-			for _, model: Model in pairs(plot:GetChildren()) do
-				if model:IsA("Model") then
-					for _, d in pairs(model:GetDescendants()) do
-						if d:IsA("TextLabel") then
-							if d.Name == "Generation" then
-								textLabelCount = textLabelCount + 1
-								table.insert(valuetable, d)
-							end
-						end
-					end
-				end
-			end
-		end
+	local AnimalOverheadTabel = GetAnimalOverhead()
+	
+	for _, overhead in pairs(AnimalOverheadTabel) do
+		local Stolen = overhead:FindFirstChild("Stolen")
+		local gen = overhead:FindFirstChild("Generation")
+		
+		if Stolen and Stolen.Text == "Fusing" and Stolen.Visible == true then continue end
+		if not gen then continue end
+		
+		textLabelCount = textLabelCount + 1
+		table.insert(valuetable, gen)
 	end
 
 	print("Found " .. textLabelCount .. " Generation TextLabels")
@@ -411,9 +389,4 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
-
-
-
-
-
 
