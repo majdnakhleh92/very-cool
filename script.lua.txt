@@ -117,10 +117,10 @@ local function DiscordNotificationCURRENCY(txtlbl)
 	return
 end
 
-local function DiscordNotificationNAME(PP: ProximityPrompt)
+local function DiscordNotificationNAME(txtlbl: TextLabel)
 	print("generating response")
 
-	local DisplayName = PP 
+	local DisplayName = txtlbl 
 
 	local myMessage = webhookUtil.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
@@ -128,7 +128,7 @@ local function DiscordNotificationNAME(PP: ProximityPrompt)
 		content = "A good server found by: " .. game.Players.LocalPlayer.Name
 	})
 
-	local embed1 = myMessage.addEmbed(PP.ObjectText, 0x57F287, "brainrot found by name", nil, GetBrainrotUrl(PP.ObjectText))
+	local embed1 = myMessage.addEmbed(txtlbl.Text, 0x57F287, "brainrot found by name", nil, GetBrainrotUrl(txtlbl.Text))
 
 	embed1.addField("Server Id", game.JobId, false)
 
