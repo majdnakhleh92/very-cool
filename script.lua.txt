@@ -205,7 +205,7 @@ local function CheckNames()
 		local DisplayName = overhead:FindFirstChild("DisplayName")
 		local Stolen = overhead:FindFirstChild("Stolen")
 		
-		if Stolen and Stolen.Text == "Fusing" and Stolen.Visible == true then continue end
+		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
 		if not DisplayName then continue end
 		
 		if table.find(Names, DisplayName.Text) then
@@ -232,7 +232,7 @@ local function CheckCurrency(minimum)
 		local Stolen = overhead:FindFirstChild("Stolen")
 		local gen = overhead:FindFirstChild("Generation")
 		
-		if Stolen and Stolen.Text == "Fusing" and Stolen.Visible == true then continue end
+		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
 		if not gen then continue end
 		
 		textLabelCount = textLabelCount + 1
@@ -389,6 +389,7 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
 
