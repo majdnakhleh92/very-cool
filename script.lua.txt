@@ -136,7 +136,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	return
 end
 
-local Names = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos", "Secret Lucky Block", "Sammyni Spyderini", "Matteo"}
+local Names = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos", "Secret Lucky Block", "Sammyni Spyderini"}
 
 local function GetAnimalOverhead()
 	local animalOverheadTable = {}
@@ -389,6 +389,7 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
 
