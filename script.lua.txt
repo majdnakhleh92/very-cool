@@ -81,6 +81,7 @@ local function GetBrainrotUrl(name)
 	if brainrotImage then
 		return brainrotImage
 	end
+	return nil
 end
 
 local function GetPlayerPlot(any)
@@ -89,7 +90,7 @@ local function GetPlayerPlot(any)
 			return plot
 		end
 	end
-	return
+	return nil
 end
 
 
@@ -136,7 +137,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	return
 end
 
-local Names = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos", "Secret Lucky Block", "Sammyni Spyderini"}
+local Names = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos", "Secret Lucky Block"}
 
 local function GetAnimalOverhead()
 	local animalOverheadTable = {}
@@ -389,6 +390,7 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
 
