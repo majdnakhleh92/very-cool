@@ -1,5 +1,65 @@
 local queue_on_teleport = queue_on_teleport
-local webhookUtil = loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
+local webhookLibrary = {}
+local HttpService = cloneref(game:GetService("HttpService"))
+local request = request or httprequest or http_request
+
+function webhookLibrary.createMessage(properties)
+	assert(properties.Url, "Url required")
+	assert(properties.username, "username required")
+	assert(properties.content, "content required")
+
+	local requestTable = {
+		Url = properties.Url,
+		Method = "POST",
+		Headers = {
+			["Content-Type"] = "application/json"
+		},
+		Body = {
+			["username"] = properties.username,
+			["content"] = properties.content or "",
+			["embeds"] = {}
+		}
+	}
+	local webhookFunctions = {}
+	local EmbedIndex = 0
+	function webhookFunctions.addEmbed(title: string, color: number, description: string, footer, thumbnail)
+		assert(title, "title required")
+		assert(description, "description required")
+		assert(color, "color required")
+		footer = footer or ""
+
+		EmbedIndex += 1
+		local privateIndex = EmbedIndex
+
+		table.insert(requestTable.Body.embeds, {
+			["title"] = title,
+			["color"] = tonumber(color),
+			["description"] = description,
+			["fields"] = {},
+			["footer"] = {["text"] = footer},
+			["thumbnail"] = {["url"] = thumbnail}
+		})
+		local embedFunctions = {}
+		function embedFunctions.addField(name, value, inline)
+			assert(name, "name required")
+			assert(value, "value required")
+			inline = inline or false
+			table.insert(requestTable.Body.embeds[privateIndex].fields, {
+				["name"] = name,
+				["value"] = value,
+				["inline"] = inline
+			})
+		end
+		return embedFunctions
+	end
+	function webhookFunctions.sendMessage()
+		requestTable.Body = HttpService:JSONEncode(requestTable.Body)
+		local response = request(requestTable)
+		return response
+	end
+	return webhookFunctions
+end
+
 local brainrotImages = loadstring(game:HttpGet("https://pastebin.com/raw/i0AJf9G9"))()
 
 print("script started")
@@ -103,7 +163,7 @@ local function DiscordNotificationCURRENCY(txtlbl)
 	local DisplayName = ovrhead:FindFirstChild("DisplayName")
 	local gen = ovrhead:FindFirstChild("Generation")
 
-	local myMessage = webhookUtil.createMessage({
+	local myMessage = webhookLibrary.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
 		username = "Script Logs",
 		content = "A good server found by: " .. game.Players.LocalPlayer.Name
@@ -123,7 +183,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 
 	local DisplayName = txtlbl 
 
-	local myMessage = webhookUtil.createMessage({
+	local myMessage = webhookLibrary.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
 		username = "Script Logs",
 		content = "A good server found by: " .. game.Players.LocalPlayer.Name
@@ -141,7 +201,7 @@ local Names = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", 
 
 local function GetAnimalOverhead()
 	local animalOverheadTable = {}
-	
+
 	for _, plot in pairs(workspace.Plots:GetChildren()) do
 		for _, BillboardGui: TextLabel in pairs(plot:GetDescendants()) do
 			if BillboardGui:IsA("BillboardGui") and BillboardGui.Name == "AnimalOverhead" then
@@ -149,7 +209,7 @@ local function GetAnimalOverhead()
 			end
 		end
 	end
-	
+
 	return animalOverheadTable
 end
 
@@ -199,16 +259,16 @@ end
 local function CheckNames() 
 	local nameMatch = nil
 	local PLR = nil
-	
+
 	local AnimalOverheadTabel = GetAnimalOverhead()
-	
+
 	for _, overhead in pairs(AnimalOverheadTabel) do
 		local DisplayName = overhead:FindFirstChild("DisplayName")
 		local Stolen = overhead:FindFirstChild("Stolen")
-		
+
 		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
 		if not DisplayName then continue end
-		
+
 		if table.find(Names, DisplayName.Text) then
 			nameMatch = DisplayName
 			print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
@@ -228,14 +288,14 @@ local function CheckCurrency(minimum)
 	local textLabelCount = 0
 
 	local AnimalOverheadTabel = GetAnimalOverhead()
-	
+
 	for _, overhead in pairs(AnimalOverheadTabel) do
 		local Stolen = overhead:FindFirstChild("Stolen")
 		local gen = overhead:FindFirstChild("Generation")
-		
+
 		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
 		if not gen then continue end
-		
+
 		textLabelCount = textLabelCount + 1
 		table.insert(valuetable, gen)
 	end
@@ -390,13 +450,3 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
-
-
-
-
-
-
-
-
-
-
