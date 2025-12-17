@@ -162,6 +162,7 @@ local function DiscordNotificationCURRENCY(txtlbl)
 
 	local DisplayName = ovrhead:FindFirstChild("DisplayName")
 	local gen = ovrhead:FindFirstChild("Generation")
+	print(GetBrainrotUrl(DisplayName.Text))
 
 	local myMessage = webhookLibrary.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
@@ -170,7 +171,7 @@ local function DiscordNotificationCURRENCY(txtlbl)
 	})
 
 	local embed1 = myMessage.addEmbed(DisplayName.Text, 0x57F287, gen.Text, nil, GetBrainrotUrl(DisplayName.Text))
-	print(GetBrainrotUrl(DisplayName.Text))
+	
 	embed1.addField("Player's Name", Owner.Name, false)
 	embed1.addField("Server Id", game.JobId, false)
 
@@ -182,7 +183,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	print("generating response")
 
 	local DisplayName = txtlbl 
-
+	print(GetBrainrotUrl(txtlbl.Text))
 	local myMessage = webhookLibrary.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
 		username = "Script Logs",
@@ -190,7 +191,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	})
 
 	local embed1 = myMessage.addEmbed(txtlbl.Text, 0x57F287, "brainrot found by name", nil, GetBrainrotUrl(txtlbl.Text))
-	print(GetBrainrotUrl(txtlbl.Text))
+	
 	embed1.addField("Server Id", game.JobId, false)
 
 	myMessage.sendMessage()
@@ -322,10 +323,6 @@ if meetsMinimum then
 	sound.Parent = game.SoundService 
 	sound:Play()
 
-	task.spawn(function()
-		loadstring(game:HttpGet(mainScript))()
-	end)
-
 	DiscordNotificationCURRENCY(currencyTextLabel)
 
 elseif nameFound then
@@ -336,10 +333,6 @@ elseif nameFound then
 	sound.Looped = false
 	sound.Parent = game.SoundService 
 	sound:Play()
-
-	task.spawn(function()
-		loadstring(game:HttpGet(mainScript))()
-	end)
 
 	DiscordNotificationNAME(matchedName)
 else
@@ -450,5 +443,6 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
