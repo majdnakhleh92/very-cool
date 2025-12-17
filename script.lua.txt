@@ -162,7 +162,7 @@ local function DiscordNotificationCURRENCY(txtlbl)
 
 	local DisplayName = ovrhead:FindFirstChild("DisplayName")
 	local gen = ovrhead:FindFirstChild("Generation")
-	print(GetBrainrotUrl(DisplayName.Text))
+	print(DisplayName.Text)
 
 	local myMessage = webhookLibrary.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
@@ -171,7 +171,7 @@ local function DiscordNotificationCURRENCY(txtlbl)
 	})
 
 	local embed1 = myMessage.addEmbed(DisplayName.Text, 0x57F287, gen.Text, nil, GetBrainrotUrl(DisplayName.Text))
-	
+
 	embed1.addField("Player's Name", Owner.Name, false)
 	embed1.addField("Server Id", game.JobId, false)
 
@@ -183,7 +183,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	print("generating response")
 
 	local DisplayName = txtlbl 
-	print(GetBrainrotUrl(txtlbl.Text))
+	print(txtlbl.Text)
 	local myMessage = webhookLibrary.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
 		username = "Script Logs",
@@ -191,7 +191,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	})
 
 	local embed1 = myMessage.addEmbed(txtlbl.Text, 0x57F287, "brainrot found by name", nil, GetBrainrotUrl(txtlbl.Text))
-	
+
 	embed1.addField("Server Id", game.JobId, false)
 
 	myMessage.sendMessage()
@@ -443,6 +443,3 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
-
-
-
