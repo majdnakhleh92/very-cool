@@ -15,7 +15,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 
 		print(2)
 
-		task.wait(2)
+		task.wait(3)
 
 		print(3)
 
@@ -390,6 +390,7 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
 
 
 
