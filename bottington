@@ -379,10 +379,7 @@ if meetsMinimum then
 	sound:Play()
 
 	DiscordNotificationCURRENCY(currencyTextLabel)
-	
-	task.wait(2)
-	
-	ServerHop()
+
 	
 elseif nameFound then
 	print("yess we found")
@@ -395,9 +392,6 @@ elseif nameFound then
 
 	DiscordNotificationNAME(matchedName)
 	
-	task.wait(2)
-
-	ServerHop()
 else
 	ServerHop()
 end
