@@ -99,7 +99,7 @@ end
 
 local function DiscordNotificationCURRENCY(txtlbl)
 	if not s then return end
-	
+
 	local ovrhead = txtlbl.Parent
 	local Plot = GetPlayerPlot(txtlbl)
 	local plotSignTextLabel = Plot.PlotSign.SurfaceGui.Frame.TextLabel
@@ -125,9 +125,13 @@ end
 
 local function DiscordNotificationNAME(txtlbl: TextLabel)
 	if not s then return end
-	
-	print("generating response")
 
+	print("generating response")
+	
+	local Plot = GetPlayerPlot(txtlbl)
+	local plotSignTextLabel = Plot.PlotSign.SurfaceGui.Frame.TextLabel
+	local Owner = GetPlayerNameFromLabel(plotSignTextLabel)
+	
 	local DisplayName = txtlbl 
 
 	local myMessage = webhookUtil.createMessage({
@@ -137,7 +141,9 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	})
 
 	local embed1 = myMessage.addEmbed(txtlbl.Text, 0x57F287, "brainrot found by name", nil, GetBrainrotUrl(txtlbl.Text))
-
+	
+	
+	embed1.addField("Player's Name", Owner.Name, false)
 	embed1.addField("Server Id", game.JobId, false)
 
 	myMessage.sendMessage()
@@ -186,6 +192,12 @@ local function GetMostValuable(strings, minimum)
 					bestTextLabel = txtlbl
 					bestString = str
 					print("Valid currency string: " .. str .. " -> Value: " .. value)
+					
+					local plrPlot = GetPlayerPlot(txtlbl)
+					if plrPlot then
+						local Owner = GetPlayerNameFromLabel(plrPlot.PlotSign.SurfaceGui.Frame.TextLabel)
+						if Owner then print(Owner) end
+					end
 				end
 			end
 		else
@@ -218,7 +230,7 @@ local function CheckNames()
 
 		if table.find(Names, DisplayName.Text) then
 			nameMatch = DisplayName
-			print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
+			warn("Found matching DisplayName TextLabel: " .. DisplayName.Text)
 			break
 		end
 
@@ -365,10 +377,6 @@ local minimum = 10000000
 local nameFound, matchedName = CheckNames()
 local meetsMinimum, highestAmount, currencyTextLabel = CheckCurrency(minimum)
 
-
-local hasMatch = meetsMinimum or nameFound
-local mainScript = "https://api.luarmor.net/files/v3/loaders/ac88f99f2b292242281d052a71f08a70.lua"
-
 if meetsMinimum then
 	print("Ooooo we got something")
 	local sound = Instance.new("Sound")
@@ -380,7 +388,6 @@ if meetsMinimum then
 
 	DiscordNotificationCURRENCY(currencyTextLabel)
 
-	
 elseif nameFound then
 	print("yess we found")
 	local sound = Instance.new("Sound")
@@ -391,7 +398,7 @@ elseif nameFound then
 	sound:Play()
 
 	DiscordNotificationNAME(matchedName)
-	
+
 else
 	ServerHop()
 end
