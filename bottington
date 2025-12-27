@@ -34,13 +34,6 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 				Text = "somethingwentwrong",
 				Duration = 5
 			})
- 
-			local sound = Instance.new("Sound")
-			sound.SoundId = "rbxassetid://4881487887"
-			sound.Volume = 0.5
-			sound.Looped = false
-			sound.Parent = SoundService
-			sound:Play()
 			
 			local Tried
 			local API, HttpService, TeleportService, CoreGui = nil, game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
