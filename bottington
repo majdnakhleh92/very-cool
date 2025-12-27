@@ -85,23 +85,9 @@ local function GetBrainrotUrl(name)
 	return nil
 end
 
-local function GetPlayerPlot(any)
-	for _, plot in pairs(workspace.Plots:GetChildren()) do
-		if any:IsDescendantOf(plot) then
-			return plot
-		end
-	end
-	return nil
-end
-
-
 local function DiscordNotificationCURRENCY(txtlbl)
-	if not s then return end
 
 	local ovrhead = txtlbl.Parent
-	local Plot = GetPlayerPlot(txtlbl)
-	local plotSignTextLabel = Plot.PlotSign.SurfaceGui.Frame.TextLabel
-	local Owner = GetPlayerNameFromLabel(plotSignTextLabel)
 
 	local DisplayName = ovrhead:FindFirstChild("DisplayName")
 	local gen = ovrhead:FindFirstChild("Generation")
@@ -114,7 +100,6 @@ local function DiscordNotificationCURRENCY(txtlbl)
 
 	local embed1 = myMessage.addEmbed(DisplayName.Text, 0x57F287, gen.Text, nil, GetBrainrotUrl(DisplayName.Text))
 
-	embed1.addField("Player's Name", Owner.Name, false)
 	embed1.addField("Server Id", game.JobId, false)
 
 	myMessage.sendMessage()
@@ -122,13 +107,8 @@ local function DiscordNotificationCURRENCY(txtlbl)
 end
 
 local function DiscordNotificationNAME(txtlbl: TextLabel)
-	if not s then return end
 
 	print("generating response")
-
-	local Plot = GetPlayerPlot(txtlbl)
-	local plotSignTextLabel = Plot.PlotSign.SurfaceGui.Frame.TextLabel
-	local Owner = GetPlayerNameFromLabel(plotSignTextLabel)
 
 	local DisplayName = txtlbl 
 
@@ -140,8 +120,6 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 
 	local embed1 = myMessage.addEmbed(txtlbl.Text, 0x57F287, "brainrot found by name", nil, GetBrainrotUrl(txtlbl.Text))
 
-
-	embed1.addField("Player's Name", Owner.Name, false)
 	embed1.addField("Server Id", game.JobId, false)
 
 	myMessage.sendMessage()
