@@ -228,7 +228,7 @@ local function ServerHop()
     local CoreGui = game:GetService("CoreGui")
     local API = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?limit=50"  -- Safer limit
     local RemoveErrorPrompts = true
-    local IterationSpeed = 0.5  -- Slower for reliability
+    local IterationSpeed = 0.25  -- Slower for reliability
     local ExcludefullServers = false
 
     local function SafeHttpGet(url, retries)
