@@ -153,9 +153,9 @@ local Names = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", 
 local function GetAnimalOverhead()
 	local animalOverheadTable = {}
 
-	for _, BillboardGui in pairs(workspace:GetDescendants()) do
-		if BillboardGui:IsA("BillboardGui") and BillboardGui.Name == "AnimalOverhead" then
-			table.insert(animalOverheadTable, BillboardGui)
+	for _, SurfaceGui in pairs(workspace:GetDescendants()) do
+		if SurfaceGui:IsA("SurfaceGui") and SurfaceGui.Name == "AnimalOverhead" then
+			table.insert(animalOverheadTable, SurfaceGui)
 		end
 	end
 
