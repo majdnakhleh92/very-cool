@@ -324,6 +324,8 @@ if meetsMinimum then
     sound.Parent = game.SoundService
     sound:Play()
     DiscordNotificationCURRENCY(currencyTextLabel)
+    task.wait(5)
+    ServerHop()
 elseif nameFound then
     print("[DEBUG] Name condition met - staying!")
     print("yess we found")
@@ -334,6 +336,8 @@ elseif nameFound then
     sound.Parent = game.SoundService
     sound:Play()
     DiscordNotificationNAME(matchedName)
+    task.wait(5)
+    ServerHop()
 else
     print("[DEBUG] No good server - hopping!")
     print("trying to leave")
