@@ -1,8 +1,5 @@
 local queue_on_teleport = queue_on_teleport
-local s, webhookUtil = pcall(function()
-	local Script = loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
-	return Script()
-end)
+local webhookUtil = loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
 local brainrotImages = loadstring(game:HttpGet("https://pastebin.com/raw/i0AJf9G9"))()
 
 print("script started")
