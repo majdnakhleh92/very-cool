@@ -368,8 +368,7 @@ local function ServerHop()
 	end
 
 	if Tried then
-		print("yaaaaaaaaaaaaaaaaaaaaa")
-		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
+		ServerHop()
 	end
 end
 
