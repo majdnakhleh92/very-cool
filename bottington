@@ -44,6 +44,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 			sound.Looped = false
 			sound.Parent = SoundService
 			sound:Play()
+			game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 		end
     ]])
 end)
