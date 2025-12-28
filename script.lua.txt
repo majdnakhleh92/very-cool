@@ -84,21 +84,9 @@ local function GetBrainrotUrl(name)
 	return nil
 end
 
-local function GetPlayerPlot(any)
-	for _, plot in pairs(workspace.Plots:GetChildren()) do
-		if any:IsDescendantOf(plot) then
-			return plot
-		end
-	end
-	return nil
-end
-
-
 local function DiscordNotificationCURRENCY(txtlbl)
+
 	local ovrhead = txtlbl.Parent
-	local Plot = GetPlayerPlot(txtlbl)
-	local plotSignTextLabel = Plot.PlotSign.SurfaceGui.Frame.TextLabel
-	local Owner = GetPlayerNameFromLabel(plotSignTextLabel)
 
 	local DisplayName = ovrhead:FindFirstChild("DisplayName")
 	local gen = ovrhead:FindFirstChild("Generation")
@@ -111,7 +99,6 @@ local function DiscordNotificationCURRENCY(txtlbl)
 
 	local embed1 = myMessage.addEmbed(DisplayName.Text, 0x57F287, gen.Text, nil, GetBrainrotUrl(DisplayName.Text))
 
-	embed1.addField("Player's Name", Owner.Name, false)
 	embed1.addField("Server Id", game.JobId, false)
 
 	myMessage.sendMessage()
@@ -119,6 +106,7 @@ local function DiscordNotificationCURRENCY(txtlbl)
 end
 
 local function DiscordNotificationNAME(txtlbl: TextLabel)
+
 	print("generating response")
 
 	local DisplayName = txtlbl 
@@ -141,15 +129,13 @@ local Names = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", 
 
 local function GetAnimalOverhead()
 	local animalOverheadTable = {}
-	
-	for _, plot in pairs(workspace.Plots:GetChildren()) do
-		for _, BillboardGui: TextLabel in pairs(plot:GetDescendants()) do
-			if BillboardGui:IsA("BillboardGui") and BillboardGui.Name == "AnimalOverhead" then
-				table.insert(animalOverheadTable, BillboardGui)
-			end
+
+	for _, SurfaceGui in pairs(workspace:GetDescendants()) do
+		if SurfaceGui:IsA("SurfaceGui") and SurfaceGui.Name == "AnimalOverhead" then
+			table.insert(animalOverheadTable, SurfaceGui)
 		end
 	end
-	
+
 	return animalOverheadTable
 end
 
@@ -199,16 +185,16 @@ end
 local function CheckNames() 
 	local nameMatch = nil
 	local PLR = nil
-	
+
 	local AnimalOverheadTabel = GetAnimalOverhead()
-	
+
 	for _, overhead in pairs(AnimalOverheadTabel) do
 		local DisplayName = overhead:FindFirstChild("DisplayName")
 		local Stolen = overhead:FindFirstChild("Stolen")
-		
+
 		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
 		if not DisplayName then continue end
-		
+
 		if table.find(Names, DisplayName.Text) then
 			nameMatch = DisplayName
 			print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
@@ -228,14 +214,14 @@ local function CheckCurrency(minimum)
 	local textLabelCount = 0
 
 	local AnimalOverheadTabel = GetAnimalOverhead()
-	
+
 	for _, overhead in pairs(AnimalOverheadTabel) do
 		local Stolen = overhead:FindFirstChild("Stolen")
 		local gen = overhead:FindFirstChild("Generation")
-		
+
 		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
 		if not gen then continue end
-		
+
 		textLabelCount = textLabelCount + 1
 		table.insert(valuetable, gen)
 	end
@@ -390,14 +376,3 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
-
-
-
-
-
-
-
-
-
-
-
