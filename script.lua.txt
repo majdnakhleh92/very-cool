@@ -125,7 +125,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	return
 end
 
-local Names = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos", "Secret Lucky Block", "67". "25", "List List List Sahur", "Noo my Candy", "Nooo my Hotspot"}
+local Names = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos", "Secret Lucky Block", "67", "25", "List List List Sahur", "Noo my Candy", "Nooo my Hotspot"}
 
 local function GetAnimalOverhead()
 	local animalOverheadTable = {}
@@ -380,6 +380,7 @@ elseif nameFound then
 else
 	Serverhop()
 end
+
 
 
 
