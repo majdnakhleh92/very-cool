@@ -125,7 +125,8 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	return
 end
 
-local Names = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos", "Secret Lucky Block", "67", "List List List Sahur", "Noo my Candy", "Nooo my Hotspot", "Bunito Bunito Spinito"}
+local blacklist = {"Lucky Block", "Triplito Tralaleritos", "Los Cucarachas", "Naughty Naughty", "Santa Hotspot", "Los 25", "25", "Los Tortus"}
+local Priority = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Los Burritos", "Secret Lucky Block", "67", "List List List Sahur", "Noo my Candy", "Nooo my Hotspot", "Bunito Bunito Spinito"}
 
 local function GetAnimalOverhead()
 	local animalOverheadTable = {}
@@ -195,14 +196,14 @@ local function CheckNames()
 		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
 		if not DisplayName then continue end
 
-		if table.find(Names, DisplayName.Text) then
+		if table.find(Priority, DisplayName.Text) then
 			nameMatch = DisplayName
 			print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
 			break
 		end
 
 		if not nameMatch or DisplayName.Text ~= nameMatch then
-			local namesStr = table.concat(Names, ", ")
+			local namesStr = table.concat(Priority, ", ")
 		end
 	end
 
@@ -220,7 +221,9 @@ local function CheckCurrency(minimum)
 		local displayName = overhead:FindFirstChild("DisplayName")
 		local gen = overhead:FindFirstChild("Generation")
 
-		if (Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true) or displayName and displayName.Text == "Lucky Block" then continue end
+		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
+		if displayName and table.find(blacklist, displayName.Text) then continue end
+		
 		if not gen then continue end
 
 		textLabelCount = textLabelCount + 1
@@ -236,7 +239,7 @@ local function Serverhop()
 	local Tried
 	local API, HttpService, TeleportService, CoreGui = nil, game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
 	local RemoveErrorPrompts = true
-	local IterationSpeed = 0.35 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
+	local IterationSpeed = 0.25 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
 	local ExcludefullServers = false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
 	local SaveTeleportAttempts = false
 
@@ -381,4 +384,3 @@ elseif nameFound then
 else
 	Serverhop()
 end
-
