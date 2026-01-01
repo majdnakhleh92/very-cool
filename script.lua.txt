@@ -217,9 +217,10 @@ local function CheckCurrency(minimum)
 
 	for _, overhead in pairs(AnimalOverheadTabel) do
 		local Stolen = overhead:FindFirstChild("Stolen")
+		local displayName = overhead:FindFirstChild("DisplayName")
 		local gen = overhead:FindFirstChild("Generation")
 
-		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
+		if (Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true) or displayName and displayName.Text == "Lucky Block" then continue end
 		if not gen then continue end
 
 		textLabelCount = textLabelCount + 1
@@ -380,20 +381,3 @@ elseif nameFound then
 else
 	Serverhop()
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
