@@ -239,7 +239,7 @@ local function Serverhop()
 	local Tried
 	local API, HttpService, TeleportService, CoreGui = nil, game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
 	local RemoveErrorPrompts = true
-	local IterationSpeed = 0.35 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
+	local IterationSpeed = 0.45 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
 	local ExcludefullServers = false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
 	local SaveTeleportAttempts = false
 
@@ -384,6 +384,7 @@ elseif nameFound then
 else
 	Serverhop()
 end
+
 
 
 
