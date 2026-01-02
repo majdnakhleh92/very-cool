@@ -125,7 +125,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	return
 end
 
-local blacklist = {"Lucky Block"--[[, "Triplito Tralaleritos", "Los Cucarachas", "Naughty Naughty", "Santa Hotspot", "Los 25", "25", "Los Tortus", "La Cucaracha"]]}
+local blacklist = {"Lucky Block"}
 local Priority = {"Chicleteira Bicicleteira", "Los Chicleteiras", "Rang Ring Bus", "Secret Lucky Block", "67", "List List List Sahur", "Noo my Candy", "Nooo my Hotspot", "Bunito Bunito Spinito"}
 
 local function GetAnimalOverhead()
@@ -384,6 +384,7 @@ elseif nameFound then
 else
 	Serverhop()
 end
+
 
 
 
