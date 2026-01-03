@@ -84,12 +84,14 @@ local function GetBrainrotUrl(name)
 	return nil
 end
 
-local function DiscordNotificationCURRENCY(txtlbl)
+local function DiscordNotificationCURRENCY(txtlbl, temp)
 
 	local ovrhead = txtlbl.Parent
 
-	local DisplayName = ovrhead:FindFirstChild("DisplayName")
-	local gen = ovrhead:FindFirstChild("Generation")
+	local bestDisplayName = ovrhead:FindFirstChild("DisplayName")
+	local bestgen = ovrhead:FindFirstChild("Generation")
+
+	local description = "**⚠︎ Other Brainrots**\n```" .. table.concat(temp, "\n") .. "```"
 
 	local myMessage = webhookUtil.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
@@ -97,7 +99,13 @@ local function DiscordNotificationCURRENCY(txtlbl)
 		content = "A good server found by: " .. game.Players.LocalPlayer.Name
 	})
 
-	local embed1 = myMessage.addEmbed(DisplayName.Text, 0x57F287, gen.Text, nil, GetBrainrotUrl(DisplayName.Text))
+	local embed1 = myMessage.addEmbed(
+		bestDisplayName.Text .. " " .. bestgen.Text,
+		0x57F287,
+		description,
+		nil,
+		GetBrainrotUrl(bestDisplayName.Text)
+	)
 
 	embed1.addField("Server Id", game.JobId, false)
 
@@ -145,6 +153,8 @@ local function GetMostValuable(strings, minimum)
 	local bestTextLabel = nil
 	local bestString = nil
 
+	local minimumMetTextLabels = {}
+
 	for _, txtlbl in ipairs(strings) do
 		local str = txtlbl.Text
 
@@ -167,6 +177,10 @@ local function GetMostValuable(strings, minimum)
 					bestString = str
 					print("Valid currency string: " .. str .. " -> Value: " .. value)
 				end
+
+				if value >= minimum then
+					table.insert(minimumMetTextLabels, txtlbl)
+				end
 			end
 		else
 			print("Skipped non-currency string: " .. str)
@@ -180,7 +194,17 @@ local function GetMostValuable(strings, minimum)
 
 	local meetsMinimum = bestValue >= minimum
 	print(string.format("Highest value: %d, Minimum: %d, Meets minimum: %s", bestValue, minimum, tostring(meetsMinimum)))
-	return meetsMinimum, bestTextLabel, bestString
+
+	local temp = {}
+	for _, moneyTL in ipairs(minimumMetTextLabels) do
+		local generation = moneyTL.Text
+		local overhead = moneyTL.Parent
+		local dpName = overhead.DisplayName
+
+		table.insert(temp, dpName.Text .. " (" .. generation .. ")")
+	end
+
+	return meetsMinimum, bestTextLabel, bestString, temp
 end
 
 local function CheckNames() 
@@ -212,8 +236,6 @@ end
 
 local function CheckCurrency(minimum)
 	local valuetable = {}
-	local textLabelCount = 0
-
 	local AnimalOverheadTabel = GetAnimalOverhead()
 
 	for _, overhead in pairs(AnimalOverheadTabel) do
@@ -223,16 +245,14 @@ local function CheckCurrency(minimum)
 
 		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
 		if displayName and table.find(blacklist, displayName.Text) then continue end
-		
-		if not gen then continue end
 
-		textLabelCount = textLabelCount + 1
+		if not gen then continue end
 		table.insert(valuetable, gen)
+
 	end
 
-	print("Found " .. textLabelCount .. " Generation TextLabels")
-	local meetsMinimum, textlabel, amount = GetMostValuable(valuetable, minimum)
-	return meetsMinimum, amount, textlabel
+	local meetsMinimum, textlabel, amount, minimumMetTextLabels = GetMostValuable(valuetable, minimum)
+	return meetsMinimum, amount, textlabel, minimumMetTextLabels
 end
 
 local function Serverhop()
@@ -344,9 +364,9 @@ local function Serverhop()
 	end
 end
 
-local minimum = 10000000
+local minimum = 10_000_000
 local nameFound, matchedName = CheckNames()
-local meetsMinimum, highestAmount, currencyTextLabel = CheckCurrency(minimum)
+local meetsMinimum, highestAmount, currencyTextLabel, temp = CheckCurrency(minimum)
 
 
 local hasMatch = meetsMinimum or nameFound
@@ -365,7 +385,7 @@ if meetsMinimum then
 		loadstring(game:HttpGet(mainScript))()
 	end)
 
-	DiscordNotificationCURRENCY(currencyTextLabel)
+	DiscordNotificationCURRENCY(currencyTextLabel, temp)
 
 elseif nameFound then
 	print("yess we found")
@@ -384,14 +404,3 @@ elseif nameFound then
 else
 	Serverhop()
 end
-
-
-
-
-
-
-
-
-
-
-
