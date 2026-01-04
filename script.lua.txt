@@ -387,7 +387,7 @@ if meetsMinimum then
 
 	task.spawn(function()
 		getgenv().basehighlight = false 
-		getgenv().protectionrange = 40
+		getgenv().protectionrange = 0
 		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/9493c7a846d19eedd5fef559796210a6.lua"))()
 	end)
 
@@ -408,7 +408,7 @@ elseif nameFound then
 
 	task.spawn(function()
 		getgenv().basehighlight = false 
-		getgenv().protectionrange = 40
+		getgenv().protectionrange = 0
 		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/9493c7a846d19eedd5fef559796210a6.lua"))()
 	end)
 
@@ -416,6 +416,7 @@ elseif nameFound then
 else
 	Serverhop()
 end
+
 
 
 
