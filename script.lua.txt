@@ -386,9 +386,7 @@ if meetsMinimum then
 	end)
 
 	task.spawn(function()
-		getgenv().basehighlight = false 
-		getgenv().protectionrange = 0
-		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/9493c7a846d19eedd5fef559796210a6.lua"))()
+		loadstring(game:HttpGet("https://pastebin.com/raw/NP5VGcP6"))()
 	end)
 
 	DiscordNotificationCURRENCY(currencyTextLabel, temp)
@@ -407,15 +405,14 @@ elseif nameFound then
 	end)
 
 	task.spawn(function()
-		getgenv().basehighlight = false 
-		getgenv().protectionrange = 0
-		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/9493c7a846d19eedd5fef559796210a6.lua"))()
+		loadstring(game:HttpGet("https://pastebin.com/raw/NP5VGcP6"))()
 	end)
 
 	DiscordNotificationNAME(matchedName)
 else
 	Serverhop()
 end
+
 
 
 
