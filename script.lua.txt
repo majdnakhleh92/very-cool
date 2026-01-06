@@ -1,6 +1,8 @@
 local queue_on_teleport = queue_on_teleport
 local webhookUtil = loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
 local brainrotImages = loadstring(game:HttpGet("https://pastebin.com/raw/i0AJf9G9"))()
+local Service = game:GetService("HttpService")
+local hubName = "garof counter" -- idk it ain a hub lmao
 
 print("script started")
 game.Players.LocalPlayer.OnTeleport:Connect(function(state)
@@ -45,7 +47,28 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
     ]])
 end)
 
+local Settings = {
+	["Server Count"] = 0
+}
 
+makefolder(hubName)
+
+function SaveSettings()
+	local JSON = Service:JSONEncode(Settings)
+	writefile(hubName .. "\\configName.cfg", JSON)
+end
+
+function LoadSettings()
+	if isfile(hubName .. "\\configName.cfg") then
+		Settings = Service:JSONDecode(readfile(hubName .. "\\configName.cfg"))
+	end
+end
+
+function ResetSettings()
+	Settings["Server Count"] = 0
+	local JSON = Service:JSONEncode(Settings)
+	writefile(hubName .. "\\configName.cfg", JSON)
+end
 
 local function GetPlayerNameFromLabel(textLabel)
 	if not textLabel or not textLabel:IsA("TextLabel") or not textLabel.Text then
@@ -262,7 +285,11 @@ local function Serverhop()
 	local IterationSpeed = 0.40 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
 	local ExcludefullServers = false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
 	local SaveTeleportAttempts = false
-
+	
+	LoadSettings()
+	Settings["Server Count"] += 1
+	SaveSettings()
+	
 	local function EncodeToFile(JSONString)
 		local success, JSONData = pcall(function()
 			return HttpService:JSONDecode(JSONString)
@@ -380,7 +407,9 @@ if meetsMinimum then
 	sound.Looped = false
 	sound.Parent = game.SoundService 
 	sound:Play()
-
+	
+	ResetSettings()
+	
 	task.spawn(function()
 		loadstring(game:HttpGet(mainScript))()
 	end)
@@ -395,7 +424,9 @@ elseif nameFound then
 	sound.Looped = false
 	sound.Parent = game.SoundService 
 	sound:Play()
-
+	
+	ResetSettings()
+	
 	task.spawn(function()
 		loadstring(game:HttpGet(mainScript))()
 	end)
@@ -404,20 +435,3 @@ elseif nameFound then
 else
 	Serverhop()
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
