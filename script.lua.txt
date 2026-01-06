@@ -131,6 +131,7 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 	)
 
 	embed1.addField("Server Id", game.JobId, false)
+	embed1.addField("Servers Hopped", Settings["Server Count"], false)
 
 	myMessage.sendMessage()
 	return
@@ -151,7 +152,8 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	local embed1 = myMessage.addEmbed(txtlbl.Text, 0x57F287, "brainrot found by name", nil, GetBrainrotUrl(txtlbl.Text))
 
 	embed1.addField("Server Id", game.JobId, false)
-
+	embed1.addField("Servers Hopped", Settings["Server Count"], false)
+	
 	myMessage.sendMessage()
 	return
 end
