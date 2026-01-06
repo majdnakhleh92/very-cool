@@ -256,7 +256,7 @@ local function CheckNames()
 	
 	
 	for _, overhead in pairs(AnimalOverheadTabel) do
-		if nameMatch then break end
+		if nameMatch ~= nil then break end
 		
 		local DisplayName = overhead:FindFirstChild("DisplayName")
 		local Stolen = overhead:FindFirstChild("Stolen")
