@@ -245,7 +245,7 @@ local function CheckNames()
 	local PLR = nil
 
 	local AnimalOverheadTabel = GetAnimalOverhead()
-	
+
 	for _, proximity in pairs(workspace.Plots:GetDescendants()) do
 		if proximity:IsA("ProximityPrompt") then
 			if proximity.ObjectText == "Secret Lucky Block" then
@@ -253,11 +253,11 @@ local function CheckNames()
 			end
 		end
 	end
-	
-	
+
+
 	for _, overhead in pairs(AnimalOverheadTabel) do
 		if nameMatch ~= nil then break end
-		
+
 		local DisplayName = overhead:FindFirstChild("DisplayName")
 		local Stolen = overhead:FindFirstChild("Stolen")
 
@@ -306,9 +306,6 @@ local function Serverhop()
 	local IterationSpeed = 0.40 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
 	local ExcludefullServers = false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
 	local SaveTeleportAttempts = false
-
-	Settings["Server Count"] += 1
-	SaveSettings()
 
 	local function EncodeToFile(JSONString)
 		local success, JSONData = pcall(function()
@@ -449,10 +446,7 @@ elseif nameFound then
 
 	DiscordNotificationNAME(matchedName)
 else
+	Settings["Server Count"] += 1
+	SaveSettings()
 	Serverhop()
 end
-
-
-
-
-
