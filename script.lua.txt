@@ -183,14 +183,11 @@ local function GetMostValuable(strings, minimum)
 	local bestValue = -math.huge
 	local bestTextLabel = nil
 	local bestString = nil
-
 	local minimumMetTextLabels = {}
 
 	for _, txtlbl in ipairs(strings) do
 		local str = txtlbl.Text
-
 		local number, suffix = string.match(str:lower(), "^%s*%$?(%d*%.?%d+)%s*([kmb]?)%s*/?s?$")
-
 		if number then
 			local value = tonumber(number)
 			if value then
@@ -201,16 +198,14 @@ local function GetMostValuable(strings, minimum)
 				elseif suffix == "b" then
 					value = value * 1_000_000_000
 				end
-
 				if value > bestValue then
 					bestValue = value
 					bestTextLabel = txtlbl
 					bestString = str
 					print("Valid currency string: " .. str .. " -> Value: " .. value)
 				end
-
 				if value >= minimum then
-					table.insert(minimumMetTextLabels, txtlbl)
+					table.insert(minimumMetTextLabels, {label = txtlbl, value = value})
 				end
 			end
 		else
@@ -220,25 +215,26 @@ local function GetMostValuable(strings, minimum)
 
 	if bestValue == -math.huge then
 		print("No valid currency strings found")
-		return false, nil, nil
+		return false, nil, nil, {}
+	end
+
+	table.sort(minimumMetTextLabels, function(a, b)
+		return a.value > b.value
+	end)
+
+	local temp = {}
+	for _, entry in ipairs(minimumMetTextLabels) do
+		local generation = entry.label.Text
+		local overhead = entry.label.Parent
+		local dpName = overhead.DisplayName
+		table.insert(temp, dpName.Text .. " (" .. generation .. ")")
 	end
 
 	local meetsMinimum = bestValue >= minimum
 	print(string.format("Highest value: %d, Minimum: %d, Meets minimum: %s", bestValue, minimum, tostring(meetsMinimum)))
 
-	local temp = {}
-	for _, moneyTL in ipairs(minimumMetTextLabels) do
-		local generation = moneyTL.Text
-		local overhead = moneyTL.Parent
-		local dpName = overhead.DisplayName
-
-		table.insert(temp, dpName.Text .. " (" .. generation .. ")")
-	end
-
 	return meetsMinimum, bestTextLabel, bestString, temp
 end
-
-game:GetDescendants()
 
 local function CheckNames() 
 	local nameMatch = nil
