@@ -298,10 +298,11 @@ end
 local function Serverhop()
 	local Tried
 	local API, HttpService, TeleportService, CoreGui = nil, game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
-	local RemoveErrorPrompts = true
-	local IterationSpeed = 0.40 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
+	local RemoveErrorPrompts = true --prevents error messages from popping up.
+	local IterationSpeed = 0.25 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
 	local ExcludefullServers = false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
-	local SaveTeleportAttempts = false
+	local SaveTeleportAttempts = false --saves every teleports that are attempted in jobid to "Attempts.txt" file
+	local API = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?limit=100"
 
 	local function EncodeToFile(JSONString)
 		local success, JSONData = pcall(function()
@@ -315,12 +316,12 @@ local function Serverhop()
 			if success then
 				writefile("Servers.JSON", encoded)
 			else
-				error("Failed to encode JSON string.")
-				return
+				warn("Failed to encode JSON string.")
+				return nil
 			end
 		else
-			error("Failed to decode JSONData.")
-			return
+			warn("Failed to decode JSONData.")
+			return nil
 		end
 		return JSONData
 	end
@@ -330,7 +331,12 @@ local function Serverhop()
 	end
 
 	local function StartTeleport()
+		Tried = true
 		local JSONData = EncodeToFile(readfile("Servers.JSON"))
+		if not JSONData then
+			writefile("Servers.JSON", game:HttpGet(API))
+			StartTeleport()
+		end
 		for i = 0, 99 do
 			if #JSONData.data <= 1 then
 				EncodeToFile(NextCursor(JSONData.nextPageCursor))
@@ -347,7 +353,6 @@ local function Serverhop()
 					appendfile("Attempts.txt", JobId .. "\n")
 				end
 				TeleportService:TeleportToPlaceInstance(game.PlaceId, JobId, game.Players.LocalPlayer)
-				Tried = true
 				task.wait(IterationSpeed)
 			end
 		end
@@ -359,18 +364,7 @@ local function Serverhop()
 		StartTeleport()
 	end
 
-	API = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?limit=100"
-
-	if RemoveErrorPrompts then
-		local ep = CoreGui:WaitForChild("RobloxGui"):WaitForChild("Modules"):FindFirstChild("ErrorPrompt")
-		if ep then
-			ep:Destroy()
-		end
-
-		if CoreGui:FindFirstChild("RobloxPromptGui") then
-			CoreGui.RobloxPromptGui:Destroy()
-		end
-	end
+	if RemoveErrorPrompts then CoreGui:WaitForChild("RobloxGui"):WaitForChild("Modules"):WaitForChild("ErrorPrompt"):Destroy() CoreGui.RobloxPromptGui:Destroy() end
 
 	if isfile("Servers.JSON") then
 		local success, JSONData = pcall(function()
@@ -388,7 +382,7 @@ local function Serverhop()
 					EncodeToFile(NextCursor(JSONData.nextPageCursor))
 					StartTeleport()
 				else
-					SetMainPage()
+					SetMainPage() --no more pages left, start over
 				end
 			end
 		else
@@ -446,6 +440,3 @@ else
 	SaveSettings()
 	Serverhop()
 end
-
-
-
