@@ -365,11 +365,11 @@ local function Serverhop()
 	end
 
 	if RemoveErrorPrompts then 
-		local errorPrompt = CoreGui:WaitForChild("RobloxGui"):WaitForChild("Modules"):WaitForChild("ErrorPrompt")
+		local errorPrompt = CoreGui:FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("ErrorPrompt")
 		if errorPrompt then
 			errorPrompt:Destroy()
 		end
-		
+
 		local RPG = CoreGui.RobloxPromptGui
 		if RPG then
 			RPG:Destroy()
