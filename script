@@ -370,7 +370,7 @@ local function Serverhop()
 			errorPrompt:Destroy()
 		end
 
-		local RPG = CoreGui.RobloxPromptGui
+		local RPG = CoreGui:FindFirstChild("RobloxPromptGui")
 		if RPG then
 			RPG:Destroy()
 		end
