@@ -297,7 +297,7 @@ local function CheckCurrency(minimum)
 		local displayName = overhead:FindFirstChild("DisplayName")
 		local gen = overhead:FindFirstChild("Generation")
 
-		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
+		if Stolen and (Stolen.Text == "FUSING" or Stolen.Text == "IN DUEL") and Stolen.Visible == true then continue end
 		if displayName and table.find(blacklist, displayName.Text) then continue end
 
 		if not gen then continue end
