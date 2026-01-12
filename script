@@ -111,11 +111,11 @@ end
 
 local function Anonymousify()
 	local player = game.Players.LocalPlayer	
-	
+
 	for _, plot in pairs(workspace.Plots:GetChildren()) do
 		local textlabel = plot:FindFirstChild("PlotSign"):FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("TextLabel")
 		if not textlabel then return end
-		
+
 		local playerFromSign = GetPlayerNameFromLabel(textlabel)
 		if player == playerFromSign then
 			textlabel.Text = "good luck finding me lmao"
@@ -298,7 +298,15 @@ local function CheckCurrency(minimum)
 		local gen = overhead:FindFirstChild("Generation")
 
 		if Stolen and (Stolen.Text == "FUSING" or Stolen.Text == "IN DUEL") and Stolen.Visible == true then continue end
-		if displayName and table.find(blacklist, displayName.Text) then continue end
+		if displayName and table.find(blacklist, displayName.Text) then
+			local blacklistMinumum = 100_000_000
+			local meetsMinimum, textlabel, amount, minimumMetTextLabels = GetMostValuable(valuetable, blacklistMinumum)
+			
+			if meetsMinimum then
+				return meetsMinimum, amount, textlabel, minimumMetTextLabels
+			end
+			
+		end
 
 		if not gen then continue end
 		table.insert(valuetable, gen)
@@ -436,13 +444,13 @@ if meetsMinimum then
 	sound.Looped = false
 	sound.Parent = game.SoundService 
 	sound:Play()
-	
+
 	Anonymousify()
-	
+
 	task.spawn(function()
 		loadstring(game:HttpGet(mainScript))()
 	end)
-	
+
 	DiscordNotificationCURRENCY(currencyTextLabel, temp)
 
 elseif nameFound then
@@ -452,9 +460,9 @@ elseif nameFound then
 	sound.Looped = false
 	sound.Parent = game.SoundService 
 	sound:Play()
-	
+
 	Anonymousify()
-	
+
 	task.spawn(function()
 		loadstring(game:HttpGet(mainScript))()
 	end)
