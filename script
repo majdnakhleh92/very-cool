@@ -278,6 +278,12 @@ local function CheckNames()
 			nameMatch = DisplayName
 			print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
 			break
+		elseif DisplayName.Text == "Lucky Block" then
+			if overhead:FindFirstChild("Rarity") and overhead.Rarity.Text == "Secret" then 
+				nameMatch = DisplayName
+				print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
+				break
+			end
 		end
 
 		if not nameMatch or DisplayName.Text ~= nameMatch then
