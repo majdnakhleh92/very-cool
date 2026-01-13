@@ -179,7 +179,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 end
 
 local blacklist = {"Los Nooo My Hotspotsitos", "Bunito Bunito Spinito", "Horegini Boom", "Lucky Block", "Giftini Spyderini", "Santa Hotspot", "Naughty Naughty", "Los Cucarachas", "La Cucaracha", "Pot Hotspot", "Los 25", "Ho Ho Ho Sahur", "To to to Sahur", "Chimnino", "Graipuss Medussi", "Rocco Disco", "Triplito Tralaleritos", "La Vacca Prese Presente", "Los Tralaleritos", "Guerriro Digitale", "Noo my Present", "Las Tralaleritas", "Los Tortus", "Job Job Job Sahur", "Los Burritos", "Los Jobcitos", "Burrito Bandito", "Quesadilla Crocodila", "Los Quesadillas", "Tung Tung Tung Sahur", "Cuadramat and Pakrahmatmamat", "List List List Sahur", "Chicleteirina Bicicleteirina"}
-local Priority = {"Nooo my Hotspot", "Raccooni Jandelini", "Matteo", "Chicleteira Bicicleteira"}
+local Priority = {"Rang Ring Bus", "Nooo my Hotspot", "Raccooni Jandelini"}
 
 local function GetAnimalOverhead()
 	local animalOverheadTable = {}
@@ -299,8 +299,13 @@ local function CheckCurrency(minimum)
 
 		if Stolen and (Stolen.Text == "FUSING" or Stolen.Text == "IN DUEL") and Stolen.Visible == true then continue end
 		if displayName and table.find(blacklist, displayName.Text) then
+			local blacklistMinumum = 100_000_000
+			local meetsMinimum, textlabel, amount, minimumMetTextLabels = GetMostValuable(valuetable, blacklistMinumum)
+
+			if meetsMinimum then
+				return meetsMinimum, amount, textlabel, minimumMetTextLabels
+			end
 			continue
-			
 		end
 
 		if not gen then continue end
