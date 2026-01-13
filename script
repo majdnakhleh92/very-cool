@@ -440,7 +440,7 @@ local mainScript = "https://raw.githubusercontent.com/ily123950/Vulkan/refs/head
 if meetsMinimum then
 	local sound = Instance.new("Sound")
 	sound.SoundId = "rbxassetid://8486683243"
-	sound.Volume = 1
+	sound.Volume = 3
 	sound.Looped = false
 	sound.Parent = game.SoundService 
 	sound:Play()
@@ -456,7 +456,7 @@ if meetsMinimum then
 elseif nameFound then
 	local sound = Instance.new("Sound")
 	sound.SoundId = "rbxassetid://8486683243"
-	sound.Volume = 1
+	sound.Volume = 3
 	sound.Looped = false
 	sound.Parent = game.SoundService 
 	sound:Play()
