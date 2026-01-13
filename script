@@ -185,7 +185,7 @@ local function GetAnimalOverhead()
 	local animalOverheadTable = {}
 
 	for _, SurfaceGui in pairs(workspace:GetDescendants()) do
-		if SurfaceGui:IsA("SurfaceGui") and SurfaceGui.Name == "AnimalOverhead" then
+		if SurfaceGui:IsA("SurfaceGui") and SurfaceGui.Name == "AnimalOverhead" and SurfaceGui.Visible == true then
 			table.insert(animalOverheadTable, SurfaceGui)
 		end
 	end
