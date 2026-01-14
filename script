@@ -1,10 +1,26 @@
 local queue_on_teleport = queue_on_teleport
+local StarterGui = game:GetService("StarterGui")
 local webhookUtil = loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
 local brainrotImages = loadstring(game:HttpGet("https://pastebin.com/raw/i0AJf9G9"))()
 local Service = game:GetService("HttpService")
 local hubName = "garof counter" -- idk it ain a hub lmao
 
 print("script started")
+if getgenv().started then
+	StarterGui:SetCore("SendNotification", {
+		Title = "Script Already Ran!",
+		Text = "Do you want to rejoin?",
+		Duration = 5,
+		Button1 = "Yes",
+		Button2 = "No",
+		Callback = function(button)
+			if button == "Yes" then
+				game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+			end
+		end
+	})
+end
+
 game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 	if state ~= Enum.TeleportState.Started and state ~= Enum.TeleportState.InProgress then return end
 	if getgenv().started then return end
