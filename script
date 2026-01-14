@@ -5,10 +5,13 @@ local Service = game:GetService("HttpService")
 local hubName = "garof counter" -- idk it ain a hub lmao
 
 print("script started")
+getgenv().started = true
+local started = false
 game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 	if state ~= Enum.TeleportState.Started and state ~= Enum.TeleportState.InProgress then return end
 
-	queue_on_teleport([[
+	if not started then
+		queue_on_teleport([[
 		print(1) -- rlly hope this doesnt break bro
 
 		repeat
@@ -44,7 +47,9 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 			sound.Parent = SoundService
 			sound:Play()
 		end
-    ]])
+    	]])
+		started = true
+	end
 end)
 
 local Settings = {
