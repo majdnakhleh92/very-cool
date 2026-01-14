@@ -7,9 +7,9 @@ local hubName = "garof counter" -- idk it ain a hub lmao
 print("script started")
 game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 	if state ~= Enum.TeleportState.Started and state ~= Enum.TeleportState.InProgress then return end
-
-	if not started then
-		queue_on_teleport([[
+	if getgenv().started then return end
+	
+	queue_on_teleport([[
 		print(1) -- rlly hope this doesnt break bro
 
 		repeat
@@ -44,10 +44,11 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 			sound.Looped = false
 			sound.Parent = SoundService
 			sound:Play()
+			getgenv().started = false
 		end
-    	]])
-		getgenv().started = true
-	end
+    ]])
+	
+	getgenv().started = true
 end)
 
 local Settings = {
@@ -255,7 +256,7 @@ end
 
 local function CreateRedLine(surfaceGui)
 	if not surfaceGui then return end
-	
+
 	local Players = game:GetService("Players")
 	local RunService = game:GetService("RunService")
 
@@ -315,7 +316,7 @@ local function CheckNames()
 				CreateRedLine()
 				break
 			end
-			
+
 		end
 
 		if not nameMatch or DisplayName.Text ~= nameMatch then
