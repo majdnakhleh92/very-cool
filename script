@@ -256,6 +256,8 @@ local function GetMostValuable(strings, minimum)
 end
 
 local function CreateRedLine(surfaceGui)
+	if not surfaceGui then return end
+	
 	local Players = game:GetService("Players")
 	local RunService = game:GetService("RunService")
 
@@ -263,7 +265,8 @@ local function CreateRedLine(surfaceGui)
 	local character = player.Character or player.CharacterAdded:Wait()
 	local hrp = character:WaitForChild("HumanoidRootPart")
 
-	local targetPart = surfaceGui.Adornee or surfaceGui.Parent
+	local targetPart = surfaceGui.Adornee
+	if not targetPart then return end
 
 	local att0 = Instance.new("Attachment")
 	att0.Parent = hrp
