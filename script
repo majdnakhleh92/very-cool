@@ -263,7 +263,7 @@ local function CreateRedLine(surfaceGui)
 	local character = player.Character or player.CharacterAdded:Wait()
 	local hrp = character:WaitForChild("HumanoidRootPart")
 
-	local targetPart = surfaceGui.Adornee
+	local targetPart = surfaceGui.Adornee or surfaceGui.Parent
 
 	local att0 = Instance.new("Attachment")
 	att0.Parent = hrp
@@ -281,7 +281,9 @@ local function CreateRedLine(surfaceGui)
 	beam.Parent = workspace
 
 	RunService.Heartbeat:Connect(function()
-		att1.WorldPosition = targetPart.Position - Vector3.new(0, 10, 0)
+		if targetPart and targetPart.Parent then
+			att1.WorldPosition = targetPart.Position - Vector3.new(0, 10, 0)
+		end
 	end)
 end
 
