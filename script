@@ -3,7 +3,7 @@ local StarterGui = game:GetService("StarterGui")
 local webhookUtil = loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
 local brainrotImages = loadstring(game:HttpGet("https://pastebin.com/raw/i0AJf9G9"))()
 local Service = game:GetService("HttpService")
-local hubName = "garof counter" -- idk it ain a hub lmao
+local hubName = "Garof ServerHopper" -- idk it ain a hub lmao
 
 print("script started")
 if getgenv().started then
@@ -25,7 +25,7 @@ end
 game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 	if state ~= Enum.TeleportState.Started and state ~= Enum.TeleportState.InProgress then return end
 	if getgenv().started then return end
-	
+
 	queue_on_teleport([[
 		print(1) -- rlly hope this doesnt break bro
 
@@ -64,13 +64,11 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 			getgenv().started = false
 		end
     ]])
-	
+
 	getgenv().started = true
 end)
 
-local Settings = {
-	["Server Count"] = 0
-}
+local Settings = {}
 
 makefolder(hubName)
 
@@ -87,6 +85,10 @@ end
 
 LoadSettings()
 
+for i, v in pairs(Settings) do
+	print("index:" .. tostring(i) .. "value:" .. tostring(v))
+end
+
 function ResetSettings()
 	Settings["Server Count"] = 0
 	local JSON = Service:JSONEncode(Settings)
@@ -99,8 +101,6 @@ local function GetPlayerNameFromLabel(textLabel)
 	end
 
 	local text = textLabel.Text
-
-
 	local playerName = string.match(text, "^(.+)'s Base$")
 
 	if playerName then
@@ -147,60 +147,65 @@ end
 local function DiscordNotificationCURRENCY(txtlbl, temp)
 
 	local ovrhead = txtlbl.Parent
-
+	local anonymous = game.Players.LocalPlayer.Name
 	local bestDisplayName = ovrhead:FindFirstChild("DisplayName")
 	local bestgen = ovrhead:FindFirstChild("Generation")
-
+		
 	local description = "**⚠︎ Other Brainrots**\n```" .. table.concat(temp, "\n") .. "```"
-
+	if Settings["anonymity"] == true then anonymous = "anonymous" end
 	local myMessage = webhookUtil.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
 		username = "Script Logs",
-		content = "A good server found by: " .. game.Players.LocalPlayer.Name
+		content = "A good server found by: " .. anonymous
 	})
 
 	local embed1 = myMessage.addEmbed(
 		bestDisplayName.Text .. " " .. bestgen.Text,
-		0x57F287,
+		Settings["embedColor"] or 0x57F287,
 		description,
 		nil,
 		GetBrainrotUrl(bestDisplayName.Text)
 	)
 
-	embed1.addField("Server Id", game.JobId, false)
-	embed1.addField("Servers Hopped", Settings["Server Count"], false)
+	if anonymous ~= "anonymous" then
+		embed1.addField("Server Id", game.JobId, false)
+		embed1.addField("Servers Hopped", Settings["Server Count"], false)
+	end
 
 	myMessage.sendMessage()
-
-	ResetSettings()
 	return
 end
 
 local function DiscordNotificationNAME(txtlbl: TextLabel)
 
-	print("generating response")
+	local anonymous = game.Players.LocalPlayer.Name
 
-	local DisplayName = txtlbl 
-
+	if Settings["anonymity"] == true then anonymous = "anonymous" end
 	local myMessage = webhookUtil.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
 		username = "Script Logs",
-		content = "A good server found by: " .. game.Players.LocalPlayer.Name
+		content = "A good server found by: " .. anonymous
 	})
 
-	local embed1 = myMessage.addEmbed(txtlbl.Text, 0x57F287, "brainrot found by name", nil, GetBrainrotUrl(txtlbl.Text))
+	local embed1 = myMessage.addEmbed(
+		txtlbl.Text,
+		Settings["embedColor"] or 0x57F287,
+		"brainrot found by name",
+		nil,
+		GetBrainrotUrl(txtlbl.Text)
+	)
 
-	embed1.addField("Server Id", game.JobId, false)
-	embed1.addField("Servers Hopped", Settings["Server Count"], false)
+	if anonymous ~= "anonymous" then
+		embed1.addField("Server Id", game.JobId, false)
+		embed1.addField("Servers Hopped", Settings["Server Count"], false)
+	end
 
 	myMessage.sendMessage()
-
-	ResetSettings()
 	return
 end
 
-local blacklist = {"La Grande Combinasion", "Los Nooo My Hotspotsitos", "Bunito Bunito Spinito", "Horegini Boom", "Lucky Block", "Giftini Spyderini", "Santa Hotspot", "Naughty Naughty", "Los Cucarachas", "La Cucaracha", "Pot Hotspot", "Los 25", "Ho Ho Ho Sahur", "To to to Sahur", "Chimnino", "Graipuss Medussi", "Rocco Disco", "Triplito Tralaleritos", "La Vacca Prese Presente", "Los Tralaleritos", "Guerriro Digitale", "Noo my Present", "Las Tralaleritas", "Los Tortus", "Job Job Job Sahur", "Los Burritos", "Los Jobcitos", "Burrito Bandito", "Quesadilla Crocodila", "Los Quesadillas", "Tung Tung Tung Sahur", "Cuadramat and Pakrahmatmamat", "List List List Sahur", "Chicleteirina Bicicleteirina"}
-local Priority = {"Nooo my Hotspot", "Raccooni Jandelini", "Quesadillo Vampiro"}
+local blacklist = Settings["Blacklist"] or {"La Grande Combinasion", "Los Nooo My Hotspotsitos", "Bunito Bunito Spinito", "Horegini Boom", "Lucky Block", "Giftini Spyderini", "Santa Hotspot", "Naughty Naughty", "Los Cucarachas", "La Cucaracha", "Pot Hotspot", "Los 25", "Ho Ho Ho Sahur", "To to to Sahur", "Chimnino", "Graipuss Medussi", "Rocco Disco", "Triplito Tralaleritos", "La Vacca Prese Presente", "Los Tralaleritos", "Guerriro Digitale", "Noo my Present", "Las Tralaleritas", "Los Tortus", "Job Job Job Sahur", "Los Burritos", "Los Jobcitos", "Burrito Bandito", "Quesadilla Crocodila", "Los Quesadillas", "Tung Tung Tung Sahur", "Cuadramat and Pakrahmatmamat", "List List List Sahur", "Chicleteirina Bicicleteirina"}
+local Priority = Settings["Whitelist"] or {"Nooo my Hotspot", "Raccooni Jandelini", "Quesadillo Vampiro"}
 
 local function GetAnimalOverhead()
 	local animalOverheadTable = {}
@@ -376,11 +381,11 @@ end
 local function Serverhop()
 	local Tried
 	local API, HttpService, TeleportService, CoreGui = nil, game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
-	local RemoveErrorPrompts = true --prevents error messages from popping up.
-	local IterationSpeed = 0.30 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
-	local ExcludefullServers = false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
-	local SaveTeleportAttempts = false --saves every teleports that are attempted in jobid to "Attempts.txt" file
-	local API = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?limit=100"
+	local RemoveErrorPrompts = Settings["RemoveErrorPrompts"] or true --prevents error messages from popping up.
+	local IterationSpeed = Settings["ServerhopSpeed"] or 0.30 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
+	local ExcludefullServers = Settings["ExcludefullServers"] or false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
+	local SaveTeleportAttempts = Settings["SaveTeleportAttempts"] or false --saves every teleports that are attempted in jobid to "Attempts.txt" file
+	local API = Settings["API"] or "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?limit=100"
 
 	local function EncodeToFile(JSONString)
 		local success, JSONData = pcall(function()
@@ -486,12 +491,12 @@ local function Serverhop()
 	end
 end
 
-local minimum = 10_000_000
+local minimum = tonumber(Settings["MoneyPerSecond"]) or 10_000_000
 local nameFound, matchedName = CheckNames()
 local meetsMinimum, highestAmount, currencyTextLabel, temp = CheckCurrency(minimum)
 
 local hasMatch = meetsMinimum or nameFound
-local mainScript = "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
+local mainScript = Settings["HubtoLoad"] or "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
 
 if meetsMinimum then
 	local sound = Instance.new("Sound")
@@ -502,7 +507,7 @@ if meetsMinimum then
 	sound:Play()
 
 	Anonymousify()
-
+	ResetSettings()
 	task.spawn(function()
 		loadstring(game:HttpGet(mainScript))()
 	end)
@@ -518,7 +523,7 @@ elseif nameFound then
 	sound:Play()
 
 	Anonymousify()
-
+	ResetSettings()
 	task.spawn(function()
 		loadstring(game:HttpGet(mainScript))()
 	end)
@@ -527,5 +532,4 @@ elseif nameFound then
 else
 	Settings["Server Count"] += 1
 	SaveSettings()
-	Serverhop()
 end
