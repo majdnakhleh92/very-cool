@@ -1,13 +1,415 @@
-local Service = game:GetService("HttpService")
-local hubName = "garof counter" -- idk it ain a hub lmao
+local darius = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/idonthaveoneatm/darius/refs/heads/main/bundled.luau"))()
+local hubName = "Garof ServerHopper"
+local HttpService = game:GetService("HttpService")
 
-local Settings = {["Server Count"] = 0}
+local Settings = {}
 makefolder(hubName)
 
-if not started then
-	local JSON = Service:JSONEncode(Settings)
+function SaveSettings()
+	local JSON = HttpService:JSONEncode(Settings)
 	writefile(hubName .. "\\configName.cfg", JSON)
 end
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script"))()
+function LoadSettings()
+	if isfile(hubName .. "\\configName.cfg") then
+		Settings = HttpService:JSONDecode(readfile(hubName .. "\\configName.cfg"))
+	end
+end
 
+LoadSettings()
+
+local window = darius:Window({
+	Title = hubName,
+	Description = "Garof's serverhopper configurations",
+	HideBind = Enum.KeyCode.X,
+
+	Icon = "",
+	UseConfig = false,
+	Workspace = "mainWorkspace",
+	IsMobile = game:GetService("UserInputService").TouchEnabled and not game:GetService("UserInputService").KeyboardEnabled,
+	Theme = {
+		Name = "dont care that much",
+		Colors = {
+			background = Color3.fromHex("#1C1726"),
+			background2 = Color3.fromHex("#0F0C15"),
+
+			text = Color3.fromHex("#EDEBF2"),
+			text2 = Color3.fromHex("#B7A6D4"),
+
+			selectedTab = Color3.fromHex("#1D1827"),
+
+			colorpickerBar = Color3.fromHex("#DCE1E5"),
+
+			notificationButton = Color3.fromHex("#222427"),
+
+			mobileButtonBackground = Color3.fromHex("#DCE1E5"),
+			mobileButtonText = Color3.fromHex("#2C2F33"),
+			mobileButtonImage = Color3.fromHex("#2C2F33"),
+
+			disabledBackground = Color3.fromHex("#2A2C31"),
+			disabledText = Color3.fromHex("#D6DCE0"),
+
+			toggled = Color3.fromHex("#B7A6D4"),
+
+			red = Color3.fromHex("#B7A6D4"),
+			orange = Color3.fromHex("#B7A6D4")
+		},
+	}})
+
+local function Notification(Title, Body)
+	darius:Notify({
+		Title = Title or "Error!",
+		Body = Body or "Something wrong happened",
+		Duration = 5,
+
+	})
+end
+
+local function updateParagraph(paragraph, list)
+	paragraph:SetBody(table.concat(list, ", "))
+end
+
+local function Color3ToHex(color)
+	local r = math.floor(color.R * 255)
+	local g = math.floor(color.G * 255)
+	local b = math.floor(color.B * 255)
+	return bit32.bor(bit32.lshift(r, 16), bit32.lshift(g, 8), b)
+end
+
+local function HexToColor3(hex)
+	local r = bit32.rshift(bit32.band(hex, 0xFF0000), 16) / 255
+	local g = bit32.rshift(bit32.band(hex, 0x00FF00), 8) / 255
+	local b = bit32.band(hex, 0x0000FF) / 255
+	return Color3.new(r, g, b)
+end
+
+local Serverhop = window:Tab({
+	Name = "Serverhop",
+
+	Image = ""
+})
+
+local serverhopButton = Serverhop:Button({
+	Name = "Start Serverhop",
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script.lua.txt"))()
+	end,
+})
+
+Serverhop:Divider()
+
+local HubToLoad = Serverhop:TextBox({
+	Name = "Hub to Load",
+	Callback = function(value): string
+		Settings["HubtoLoad"] = value
+	end,
+
+	FLAG = "loadhubtextbox",
+	OnlyNumbers = false,
+	OnLeave = false,
+	ClearTextOnFocus = false,
+	PlaceHolderText = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script.lua.txt"))()'
+})
+
+Serverhop:Divider()
+
+local save = Serverhop:Button({
+	Name = "Save Settings",
+	Callback = function()
+		SaveSettings()
+
+		Notification("Settings Saved!", "")
+	end,
+})
+
+local configurations = window:Tab({
+	Name = "configurations",
+
+	Image = ""
+})
+
+local moneyPerSecond = configurations:TextBox({
+	Name = "Minimum Money Per Second",
+	Callback = function(value): string
+		value = value:gsub("_", "")
+
+		Settings["MoneyPerSecond"] = value
+	end,
+
+	FLAG = "$/stextbox",
+	OnlyNumbers = false,
+	OnLeave = false,
+	ClearTextOnFocus = false,
+	PlaceHolderText = "100_000_00 or 10_000_000"
+})
+
+configurations:Divider()
+
+local serverhopSpeed = configurations:Slider({
+	Name = "Delay between server hops",
+	Min = 0,
+	Max = 1,
+	Callback = function(value): number
+		Settings["ServerhopSpeed"] = value
+	end,
+
+	DisabledText = "Hey you cant use this!",
+	FLAG = "slider",
+	DisplayAsPercent = false,
+	DecimalPlace = 2
+})
+
+configurations:Divider()
+
+local label1 = configurations:Label("You can multi add brainrots by adding a comma [ , ] after each one!") 
+
+Settings["Blacklist"] = Settings["Blacklist"] or {}
+
+local blacklisted = configurations:Paragraph({
+	Title = "Current Blacklisted Brainrots",
+	Body = table.concat(Settings["Blacklist"], ", "),
+})
+
+local blacklistTextbox = configurations:TextBox({
+	Name = "Blacklist Brainrots",
+	Callback = function(value): string
+		local trimmed = value:match("^%s*(.-)%s*$")
+		if trimmed == "" then return end
+
+		for entry in trimmed:gmatch("[^,]+") do
+			local cleaned = entry:match("^%s*(.-)%s*$")
+			if cleaned ~= "" and not table.find(Settings["Blacklist"], cleaned) then
+				table.insert(Settings["Blacklist"], cleaned)
+				Notification("blacklisted!", "[ " .. cleaned .. " ]")
+			elseif table.find(Settings["Blacklist"], cleaned) then
+				Notification("Already blacklisted!", "")
+			end
+		end
+
+		updateParagraph(blacklisted, Settings["Blacklist"])
+	end,
+	OnLeave = true,
+	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
+})
+
+local removeBlacklistTextbox = configurations:TextBox({
+	Name = "Remove Blacklisted Brainrots",
+	Callback = function(value): string
+		local trimmed = value:match("^%s*(.-)%s*$")
+		if trimmed == "" then return end
+
+		for entry in trimmed:gmatch("[^,]+") do
+			local cleaned = entry:match("^%s*(.-)%s*$")
+			if cleaned ~= "" then
+				local index = table.find(Settings["Blacklist"], cleaned)
+				if index then
+					table.remove(Settings["Blacklist"], index)
+					Notification("Removed from blacklisted!", "[ " .. cleaned .. " ]")
+				else
+					Notification("Not in blacklisted!", "[ " .. cleaned .. " ]")
+				end
+			end
+		end
+
+		updateParagraph(blacklisted, Settings["Blacklist"])
+	end,
+	OnLeave = true,
+	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
+})
+
+configurations:Divider()
+
+Settings["Whitelist"] = Settings["Whitelist"] or {}
+
+local whitelisted = configurations:Paragraph({
+	Title = "Current Whitelisted Brainrots",
+	Body = table.concat(Settings["Whitelist"], " "),
+})
+
+local whitelistTextbox = configurations:TextBox({
+	Name = "Whitelist Brainrots",
+	Callback = function(value): string
+		local trimmed = value:match("^%s*(.-)%s*$")
+		if trimmed == "" then Notification() return end
+
+		for entry in trimmed:gmatch("[^,]+") do
+			local cleaned = entry:match("^%s*(.-)%s*$")
+			if cleaned ~= "" and not table.find(Settings["Whitelist"], cleaned) then
+				table.insert(Settings["Whitelist"], cleaned)
+				Notification("whitelisted!", "[ " .. cleaned .. " ]")
+			elseif table.find(Settings["Whitelist"], cleaned) then
+				Notification("Already whitelisted!", "")
+			end
+		end
+
+		updateParagraph(whitelisted, Settings["Whitelist"])
+	end,
+	OnLeave = true,
+	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
+})
+
+local removeWhitelistTextbox = configurations:TextBox({
+	Name = "Remove Whitelisted Brainrots",
+	Callback = function(value): string
+		local trimmed = value:match("^%s*(.-)%s*$")
+		if trimmed == "" then Notification() return end
+
+		for entry in trimmed:gmatch("[^,]+") do
+			local cleaned = entry:match("^%s*(.-)%s*$")
+			if cleaned ~= "" then
+				local index = table.find(Settings["Whitelist"], cleaned)
+				if index then
+					table.remove(Settings["Whitelist"], index)
+					Notification("Removed from whitelist!", "[ " .. cleaned .. " ]")
+				else
+					Notification("Not in whitelist!", "[ " .. cleaned .. " ]")
+				end
+			end
+		end
+
+		updateParagraph(whitelisted, Settings["Whitelist"])
+	end,
+	OnLeave = true,
+	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
+})
+
+
+local discordConfiguration = window:Tab({
+	Name = "Discord Configurations",
+
+	Image = ""
+})
+
+local label1 = discordConfiguration:Label("Enabling this will remove your username, serverhop count, and serverid from the discord notification") 
+
+local anonymity = discordConfiguration:Toggle({
+	Name = "anonymity",
+	Callback = function(value): boolean
+		Settings["anonymity"] = value
+	end,
+
+	DisabledText = "Hey you cant use this!",
+	FLAG = "toggle_anonymity",
+	Default = false,
+})
+
+discordConfiguration:Divider()
+
+local embedColorPicker = discordConfiguration:ColorPicker({
+	Name = "Color Picker for the notification embed",
+	Callback = function(color, transparency): Color3 & number
+		Settings["embedColor"] = Color3ToHex(color)
+	end,
+
+	HideTransparency = true,
+	Transparency = 0
+})
+
+local advancedSettings = window:Tab({
+	Name = "Advanced Settings",
+
+	Image = ""
+})
+
+local label5 = advancedSettings:Label("Prevents error messages from popping up") 
+
+local RemoveErrorPrompts = advancedSettings:Toggle({
+	Name = "RemoveErrorPrompts",
+	Callback = function(value): boolean
+		Settings["RemoveErrorPrompts"] = value
+	end,
+
+	DisabledText = "Hey you cant use this!",
+	FLAG = "toggle_RemoveErrorPrompts",
+	Default = true,
+})
+
+advancedSettings:Divider()
+
+local label5 = advancedSettings:Label("Slightly beneficial if the game is high ccu or mid ccu") 
+
+local ExcludefullServers = advancedSettings:Toggle({
+	Name = "ExcludefullServers",
+	Callback = function(value): boolean
+		Settings["ExcludefullServers"] = value
+	end,
+
+	DisabledText = "Hey you cant use this!",
+	FLAG = "toggle_ExcludefullServers",
+	Default = false,
+})
+
+advancedSettings:Divider()
+
+local label5 = advancedSettings:Label('saves every teleports that are attempted in jobid to "Attempts.txt" file') 
+
+local SaveTeleportAttempts = advancedSettings:Toggle({
+	Name = "SaveTeleportAttempts",
+	Callback = function(value): boolean
+		Settings["SaveTeleportAttempts"] = value
+	end,
+
+	DisabledText = "Hey you cant use this!",
+	FLAG = "toggle_SaveTeleportAttempts",
+	Default = false,
+})
+
+advancedSettings:Divider()
+
+local APITextbox = advancedSettings:TextBox({
+	Name = "API",
+	Callback = function(value): string
+		Settings["API"] = value
+	end,
+
+	FLAG = "APItextbox",
+	Default = "https://games.roblox.com/v1/games/109983668079237/servers/Public?limit=100",
+	OnlyNumbers = false,
+	OnLeave = false,
+	ClearTextOnFocus = false,
+})
+
+-- // LOADING CONFIGURATIONS // --
+if Settings["HubtoLoad"] then
+	HubToLoad:SetInput(Settings["HubtoLoad"])
+end
+
+if Settings["MoneyPerSecond"] then
+	moneyPerSecond:SetInput(Settings["MoneyPerSecond"])
+end
+
+if Settings["ServerhopSpeed"] then
+	serverhopSpeed:SetValue(Settings["ServerhopSpeed"])
+end
+
+if Settings["anonymity"] ~= nil then
+	anonymity:SetValue(Settings["anonymity"])
+end
+
+if Settings["embedColor"] then
+	embedColorPicker:SetColor(HexToColor3(Settings["embedColor"]))
+end
+
+if Settings["RemoveErrorPrompts"] ~= nil then
+	RemoveErrorPrompts:SetValue(Settings["RemoveErrorPrompts"])
+end
+
+if Settings["ExcludefullServers"] ~= nil then
+	ExcludefullServers:SetValue(Settings["ExcludefullServers"])
+end
+
+if Settings["SaveTeleportAttempts"] ~= nil then
+	SaveTeleportAttempts:SetValue(Settings["SaveTeleportAttempts"])
+end
+
+if Settings["API"] then
+	APITextbox:SetInput(Settings["API"])
+end
+
+if Settings["Blacklist"] then
+	updateParagraph(blacklisted, Settings["Blacklist"])
+end
+
+if Settings["Whitelist"] then
+	updateParagraph(whitelisted, Settings["Whitelist"])
+end
