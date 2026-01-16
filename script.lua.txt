@@ -92,7 +92,7 @@ local Serverhop = window:Tab({
 local serverhopButton = Serverhop:Button({
 	Name = "Start Serverhop",
 	Callback = function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script.lua.txt"))()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script"))()
 	end,
 })
 
@@ -413,3 +413,4 @@ end
 if Settings["Whitelist"] then
 	updateParagraph(whitelisted, Settings["Whitelist"])
 end
+
