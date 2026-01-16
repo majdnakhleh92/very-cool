@@ -62,11 +62,59 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 			sound.Parent = SoundService
 			sound:Play()
 			getgenv().started = false
+			
+			local myMessage = webhookUtil.createMessage({
+			Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
+			username = "Script Logs",
+			content = "" 
+			})
+
+			local embed1 = myMessage.addEmbed(
+			"error occured",
+			0x57F287,
+			err,
+			nil,
+			nil
+			)
+
+			myMessage.sendMessage()
+			
 		end
     ]])
 
 	getgenv().started = true
 end)
+
+
+
+
+
+
+
+local myMessage = webhookUtil.createMessage({
+	Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
+	username = "Script Logs",
+	content = "" 
+})
+
+local embed1 = myMessage.addEmbed(
+	"error occured",
+	0x57F287,
+	err,
+	nil,
+	nil
+)
+
+myMessage.sendMessage()
+
+
+
+
+
+
+
+
+
 
 local Settings = {}
 
@@ -532,5 +580,4 @@ elseif nameFound then
 else
 	Settings["Server Count"] += 1
 	SaveSettings()
-	Serverhop()
 end
