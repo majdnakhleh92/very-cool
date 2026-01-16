@@ -357,19 +357,10 @@ local function CheckCurrency(minimum)
 		local gen = overhead:FindFirstChild("Generation")
 
 		if Stolen and (Stolen.Text == "FUSING" or Stolen.Text == "IN DUEL") and Stolen.Visible == true then continue end
-		if displayName and table.find(blacklist, displayName.Text) then
-			local blacklistMinumum = 100_000_000
-			local meetsMinimum, textlabel, amount, minimumMetTextLabels = GetMostValuable(valuetable, blacklistMinumum)
-
-			if meetsMinimum then
-				return meetsMinimum, amount, textlabel, minimumMetTextLabels
-			end
-			continue
-		end
+		if displayName and table.find(blacklist, displayName.Text) then continue end
 
 		if not gen then continue end
 		table.insert(valuetable, gen)
-
 	end
 
 	local meetsMinimum, textlabel, amount, minimumMetTextLabels = GetMostValuable(valuetable, minimum)
