@@ -102,10 +102,6 @@ end
 
 LoadSettings()
 
-for i, v in pairs(Settings) do
-	print("index:" .. tostring(i) .. "value:" .. tostring(v))
-end
-
 function ResetSettings()
 	Settings["Server Count"] = 0
 	local JSON = Service:JSONEncode(Settings)
