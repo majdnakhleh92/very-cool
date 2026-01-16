@@ -101,12 +101,16 @@ Serverhop:Divider()
 local HubToLoad = Serverhop:TextBox({
 	Name = "Hub to Load",
 	Callback = function(value): string
-		Settings["HubtoLoad"] = value
+		local url = value:match('https?://[^%s"\'%)]+')
+
+		if url then
+			Settings["HubtoLoad"] = url
+		else
+			Notification("Invalid Loadstring!", "make sure the URL inside the loadstring is valid.")
+		end
 	end,
 
-	FLAG = "loadhubtextbox",
-	OnlyNumbers = false,
-	OnLeave = false,
+	OnLeave = true,
 	ClearTextOnFocus = false,
 	PlaceHolderText = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script.lua.txt"))()'
 })
