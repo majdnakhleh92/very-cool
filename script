@@ -549,4 +549,5 @@ elseif nameFound then
 else
 	Settings["Server Count"] += 1
 	SaveSettings()
+	Serverhop()
 end
