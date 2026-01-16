@@ -182,7 +182,7 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 
 	if anonymous ~= "anonymous" then
 		embed1.addField("Server Id", game.JobId, false)
-		embed1.addField("Servers Hopped", Settings["Server Count"], false)
+		--embed1.addField("Servers Hopped", Settings["Server Count"], false)
 	end
 
 	myMessage.sendMessage()
@@ -210,7 +210,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 
 	if anonymous ~= "anonymous" then
 		embed1.addField("Server Id", game.JobId, false)
-		embed1.addField("Servers Hopped", Settings["Server Count"], false)
+		--embed1.addField("Servers Hopped", Settings["Server Count"], false)
 	end
 
 	myMessage.sendMessage()
