@@ -54,7 +54,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 				Text = "somethingwentwrong",
 				Duration = 5
 			})
- 
+
 			local sound = Instance.new("Sound")
 			sound.SoundId = "rbxassetid://4881487887"
 			sound.Volume = 0.5
@@ -62,11 +62,11 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 			sound.Parent = SoundService
 			sound:Play()
 			getgenv().started = false
-			
+
 			local myMessage = webhookUtil.createMessage({
-			Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
-			username = "Script Logs",
-			content = "" 
+				Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
+				username = "Script Logs",
+				content = "" 
 			})
 
 			local embed1 = myMessage.addEmbed(
@@ -78,7 +78,6 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 			)
 
 			myMessage.sendMessage()
-			
 		end
     ]])
 
@@ -148,6 +147,8 @@ local function Anonymousify()
 	local player = game.Players.LocalPlayer	
 
 	for _, plot in pairs(workspace.Plots:GetChildren()) do
+		if not plot then return end
+		
 		local textlabel = plot:FindFirstChild("PlotSign"):FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("TextLabel")
 		if not textlabel then return end
 
@@ -345,13 +346,11 @@ local function CheckNames()
 		if table.find(Priority, DisplayName.Text) then
 			nameMatch = DisplayName
 			print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
-			CreateRedLine()
 			break
 		elseif DisplayName.Text == "Lucky Block" then
 			if overhead:FindFirstChild("Rarity") and overhead.Rarity.Text == "Secret" then 
 				nameMatch = DisplayName
 				print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
-				CreateRedLine()
 				break
 			end
 
