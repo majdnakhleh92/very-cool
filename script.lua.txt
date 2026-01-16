@@ -375,7 +375,7 @@ local APITextbox = advancedSettings:TextBox({
 
 -- // LOADING CONFIGURATIONS // --
 if Settings["HubtoLoad"] then
-	HubToLoad:SetInput(Settings["HubtoLoad"])
+	HubToLoad:SetInput("loadstring(game:HttpGet(" .. Settings["HubtoLoad"] .. ")()")
 end
 
 if Settings["MoneyPerSecond"] then
