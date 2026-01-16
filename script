@@ -70,11 +70,11 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 			})
 
 			local embed1 = myMessage.addEmbed(
-			"error occured,
-			0x57F287,
-			err,
-			nil,
-			nil
+				"error occured",
+				0x57F287,
+				err,
+				nil,
+				nil
 			)
 
 			myMessage.sendMessage()
