@@ -58,11 +58,36 @@ local window = darius:Window({
 
 local function Notification(Title, Body)
 	darius:Notify({
-		Title = Title or "Error!",
-		Body = Body or "Something wrong happened",
+		Title = Title or "",
+		Body = Body or "",
 		Duration = 5,
 
 	})
+end
+
+local function ParseNumber(str)
+	str = tostring(str):gsub("%s+", ""):lower()
+
+	local number, suffix = string.match(str, "^(%d*%.?%d+)([kmb]?)$")
+
+	if not number then
+		return nil
+	end
+
+	local value = tonumber(number)
+	if not value then
+		return nil
+	end
+
+	if suffix == "k" then
+		value = value * 1000
+	elseif suffix == "m" then
+		value = value * 1000000
+	elseif suffix == "b" then
+		value = value * 1000000000
+	end
+
+	return value
 end
 
 local function updateParagraph(paragraph, list)
@@ -136,15 +161,20 @@ local moneyPerSecond = configurations:TextBox({
 	Name = "Minimum Money Per Second",
 	Callback = function(value): string
 		value = value:gsub("_", "")
-
-		Settings["MoneyPerSecond"] = value
+		local filtered = ParseNumber(value)
+		if filtered then
+			Settings["MoneyPerSecond"] = filtered
+			Notification("Success!", "Minimum Money Per Second set to " .. filtered)
+		else
+			Notification("Invalid Number!", "make sure the number is valid")
+		end
 	end,
 
 	FLAG = "$/stextbox",
 	OnlyNumbers = false,
-	OnLeave = false,
+	OnLeave = true,
 	ClearTextOnFocus = false,
-	PlaceHolderText = "100_000_00 or 10_000_000"
+	PlaceHolderText = "100m or 10k"
 })
 
 configurations:Divider()
@@ -302,7 +332,8 @@ discordConfiguration:Divider()
 local embedColorPicker = discordConfiguration:ColorPicker({
 	Name = "Color Picker for the notification embed",
 	Callback = function(color, transparency): Color3 & number
-		Settings["embedColor"] = Color3ToHex(color)
+		local hex = Color3ToHex(color)
+		Settings["embedColor"] = hex
 	end,
 
 	HideTransparency = true,
