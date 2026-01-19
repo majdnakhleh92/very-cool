@@ -5,9 +5,28 @@ local brainrotImages = loadstring(game:HttpGet("https://pastebin.com/raw/i0AJf9G
 local Service = game:GetService("HttpService")
 local hubName = "Garof ServerHopper" -- idk it ain a hub lmao
 
+if started then
+	local bindable = Instance.new("BindableFunction")
+	bindable.OnInvoke = function(button)
+		if button == "Yes" then
+			game["Teleport Service"]:Teleport(game.PlaceId, game.Players.LocalPlayer)
+		end
+	end
+
+	StarterGui:SetCore("SendNotification", {
+		Title = "SOMETHING WENT WRONG!!!",
+		Text = "somethingwentwrong",
+		Duration = 5,
+		Button1 = "Yes",
+		Button2 = "No",
+		Callback = bindable
+	})
+	return 
+end
+pcall(function() getgenv().started = true end)
+
 game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 	if state ~= Enum.TeleportState.Started and state ~= Enum.TeleportState.InProgress then return end
-	if getgenv().started then return end
 
 	queue_on_teleport([[
 		print(1) -- rlly hope this doesnt break bro
@@ -64,8 +83,6 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 			myMessage.sendMessage()
 		end
     ]])
-
-	getgenv().started = true
 end)
 
 local Settings = {}
@@ -132,7 +149,7 @@ local function Anonymousify()
 
 	for _, plot in pairs(workspace.Plots:GetChildren()) do
 		if not plot then return end
-		
+
 		local textlabel = plot:FindFirstChild("PlotSign"):FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("TextLabel")
 		if not textlabel then return end
 
@@ -357,10 +374,17 @@ local function CheckCurrency(minimum)
 		local displayName = overhead:FindFirstChild("DisplayName")
 		local gen = overhead:FindFirstChild("Generation")
 
-		if Stolen and (Stolen.Text == "FUSING" or Stolen.Text == "IN DUEL") and Stolen.Visible == true then continue end
-		if displayName and table.find(blacklist, displayName.Text) then continue end
+		if Stolen and (Stolen.Text == "FUSING" or Stolen.Text == "IN DUEL") and Stolen.Visible == true then 
+			continue 
+		end
 
 		if not gen then continue end
+
+		if displayName and table.find(blacklist, displayName.Text) then 
+			print("Blacklisted: " .. displayName.Text)
+			continue 
+		end
+
 		table.insert(valuetable, gen)
 	end
 
