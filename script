@@ -100,8 +100,8 @@ end
 
 function LoadSettings()
 	if isfile(hubName .. "\\configName.cfg") then
-		if not Settings["Server Count"] then Settings["Server Count"] = 0 end
 		Settings = Service:JSONDecode(readfile(hubName .. "\\configName.cfg"))
+		if not Settings["Server Count"] then Settings["Server Count"] = 0 end
 	end
 end
 
