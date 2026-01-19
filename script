@@ -14,8 +14,8 @@ if started then
 	end
 
 	StarterGui:SetCore("SendNotification", {
-		Title = "SOMETHING WENT WRONG!!!",
-		Text = "somethingwentwrong",
+		Title = "The script is already running!",
+		Text = "Teleport to start?",
 		Duration = 5,
 		Button1 = "Yes",
 		Button2 = "No",
