@@ -334,14 +334,11 @@ local function CreateRedLine(surfaceGui)
 end
 
 local function CheckNames() 
-	local nameMatch = nil
-	local PLR = nil
-
+	local nameMatches = {}
+	
 	local AnimalOverheadTabel = GetAnimalOverhead()
 
 	for _, overhead in pairs(AnimalOverheadTabel) do
-		if nameMatch ~= nil then break end
-
 		local DisplayName = overhead:FindFirstChild("DisplayName")
 		local Stolen = overhead:FindFirstChild("Stolen")
 
@@ -349,24 +346,20 @@ local function CheckNames()
 		if not DisplayName then continue end
 
 		if table.find(Priority, DisplayName.Text) then
-			nameMatch = DisplayName
-			print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
-			break
+			table.insert(nameMatches, DisplayName)
+
 		elseif DisplayName.Text == "Lucky Block" then
 			if overhead:FindFirstChild("Rarity") and overhead.Rarity.Text == "Secret" then 
-				nameMatch = DisplayName
-				print("Found matching DisplayName TextLabel: " .. DisplayName.Text)
-				break
+				table.insert(nameMatches, DisplayName)
 			end
-
-		end
-
-		if not nameMatch or DisplayName.Text ~= nameMatch then
-			local namesStr = table.concat(Priority, ", ")
 		end
 	end
 
-	return nameMatch ~= nil, nameMatch
+	if #nameMatches > 0 then
+		return true, nameMatches[1]
+	end
+	
+	return false, nil
 end
 
 local function CheckCurrency(minimum)
