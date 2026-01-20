@@ -226,6 +226,34 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 	return
 end
 
+local function DiscordNotificationMUTATION(Mutation, Brainrot)
+	local anonymous = game.Players.LocalPlayer.Name
+
+	if Settings["anonymity"] == true then anonymous = "anonymous" end
+	local myMessage = webhookUtil.createMessage({
+		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
+		username = "Script Logs",
+		content = "A good server found by: " .. anonymous
+	})
+
+	local embed1 = myMessage.addEmbed(
+		Brainrot .. " Mutated With: " .. Mutation,
+		Settings["embedColor"] or 0x57F287,
+		"brainrot found by mutation",
+		nil,
+		GetBrainrotUrl(Brainrot.Text)
+	)
+
+	if anonymous ~= "anonymous" then
+		embed1.addField("Server Id", game.JobId, false)
+		embed1.addField("Servers Hopped", Settings["Server Count"], false)
+	end
+
+	myMessage.sendMessage()
+	ResetSettings()
+	return
+end
+
 local blacklist = Settings["Blacklist"] or {"La Grande Combinasion", "Los Nooo My Hotspotsitos", "Bunito Bunito Spinito", "Horegini Boom", "Lucky Block", "Giftini Spyderini", "Santa Hotspot", "Naughty Naughty", "Los Cucarachas", "La Cucaracha", "Pot Hotspot", "Los 25", "Ho Ho Ho Sahur", "To to to Sahur", "Chimnino", "Graipuss Medussi", "Rocco Disco", "Triplito Tralaleritos", "La Vacca Prese Presente", "Los Tralaleritos", "Guerriro Digitale", "Noo my Present", "Las Tralaleritas", "Los Tortus", "Job Job Job Sahur", "Los Burritos", "Los Jobcitos", "Burrito Bandito", "Quesadilla Crocodila", "Los Quesadillas", "Tung Tung Tung Sahur", "Cuadramat and Pakrahmatmamat", "List List List Sahur", "Chicleteirina Bicicleteirina"}
 local Priority = Settings["Whitelist"] or {"Nooo my Hotspot", "Raccooni Jandelini", "Quesadillo Vampiro"}
 
@@ -333,9 +361,38 @@ local function CreateRedLine(surfaceGui)
 	end)
 end
 
+local function CheckMutations()
+	local mutation = Settings["MutationTarget"] or ""
+	local Brainrots = Settings["BrainrotsTarget"] or {}
+	local MutatedBrainrotFound, Mutation, brainrot
+	
+	if mutation == "" and #Brainrots == 0 then return end
+	
+	local AnimalOverheadTable = GetAnimalOverhead()
+	
+	for _, overhead in pairs(AnimalOverheadTable) do
+		local mutationLabel = overhead:FindFirstChild("Mutation")
+		local Stolen = overhead:FindFirstChild("Stolen")
+		local DisplayName = overhead:FindFirstChild("DisplayName")
+		
+		if not DisplayName then continue end
+		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
+		if mutationLabel and mutationLabel.Visible == false then continue end
+		
+		if mutationLabel.Text == mutation and table.find(Brainrots, DisplayName.Text) then
+			MutatedBrainrotFound = true
+			Mutation = mutationLabel.Text
+			brainrot = DisplayName.Text
+			break
+		end
+	end
+	
+	return MutatedBrainrotFound, Mutation, brainrot
+end
+
 local function CheckNames() 
 	local nameMatches = {}
-	
+
 	local AnimalOverheadTabel = GetAnimalOverhead()
 
 	for _, overhead in pairs(AnimalOverheadTabel) do
@@ -358,7 +415,7 @@ local function CheckNames()
 	if #nameMatches > 0 then
 		return true, nameMatches[1]
 	end
-	
+
 	return false, nil
 end
 
@@ -505,6 +562,7 @@ end
 local minimum = tonumber(Settings["MoneyPerSecond"]) or 10_000_000
 local nameFound, matchedName = CheckNames()
 local meetsMinimum, highestAmount, currencyTextLabel, temp = CheckCurrency(minimum)
+local mutatedBrainrotFound, mutation, brainrot = CheckMutations()
 
 local hasMatch = meetsMinimum or nameFound
 local mainScript = Settings["HubtoLoad"] or "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
@@ -538,6 +596,21 @@ elseif nameFound then
 	end)
 
 	DiscordNotificationNAME(matchedName)
+	
+elseif mutatedBrainrotFound then
+	local sound = Instance.new("Sound")
+	sound.SoundId = "rbxassetid://8486683243"
+	sound.Volume = 3
+	sound.Looped = false
+	sound.Parent = game.SoundService 
+	sound:Play()
+
+	Anonymousify()
+	task.spawn(function()
+		loadstring(game:HttpGet(mainScript))()
+	end)
+
+	DiscordNotificationMUTATION(mutation, brainrot)
 else
 	Settings["Server Count"] += 1
 	SaveSettings()
