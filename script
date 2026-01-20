@@ -363,7 +363,7 @@ end
 
 local function CheckMutations()
 	local mutation = Settings["MutationTarget"] or ""
-	local Brainrots = Settings["BrainrotsTarget"] or {}
+	local Brainrots = Settings["TargetBrainrots"] or {}
 	local MutatedBrainrotFound, Mutation, brainrot
 	
 	if mutation == "" and #Brainrots == 0 then return end
@@ -379,10 +379,15 @@ local function CheckMutations()
 		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
 		if mutationLabel and mutationLabel.Visible == false then continue end
 		
+		if mutationLabel.Text == "Diamond" and DisplayName.Text == "Trippi Troppi" then
+			print("its freaky")
+		end
+		
 		if mutationLabel.Text == mutation and table.find(Brainrots, DisplayName.Text) then
 			MutatedBrainrotFound = true
 			Mutation = mutationLabel.Text
 			brainrot = DisplayName.Text
+			print("working")
 			break
 		end
 	end
