@@ -4,8 +4,9 @@ local webhookUtil = loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq")
 local brainrotImages = loadstring(game:HttpGet("https://pastebin.com/raw/i0AJf9G9"))()
 local Service = game:GetService("HttpService")
 local hubName = "Garof ServerHopper" -- idk it ain a hub lmao
+local Testing = false
 
-if started then
+if started and not Testing then
 	local bindable = Instance.new("BindableFunction")
 	bindable.OnInvoke = function(button)
 		if button == "Yes" then
@@ -459,7 +460,8 @@ local function Serverhop()
 	local ExcludefullServers = Settings["ExcludefullServers"] or false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
 	local SaveTeleportAttempts = Settings["SaveTeleportAttempts"] or false --saves every teleports that are attempted in jobid to "Attempts.txt" file
 	local API = Settings["API"] or "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?limit=100"
-
+	
+	if Testing then return end
 	local function EncodeToFile(JSONString)
 		local success, JSONData = pcall(function()
 			return HttpService:JSONDecode(JSONString)
@@ -597,6 +599,7 @@ elseif nameFound then
 
 	Anonymousify()
 	task.spawn(function()
+		if Testing then return end
 		loadstring(game:HttpGet(mainScript))()
 	end)
 
@@ -612,6 +615,7 @@ elseif mutatedBrainrotFound then
 
 	Anonymousify()
 	task.spawn(function()
+		if Testing then return end
 		loadstring(game:HttpGet(mainScript))()
 	end)
 
