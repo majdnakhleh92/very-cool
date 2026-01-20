@@ -151,12 +151,17 @@ end
 
 local function Anonymousify()
 	local player = game.Players.LocalPlayer	
-
 	for _, plot in pairs(workspace.Plots:GetChildren()) do
-		if not plot then return end
-
-		local textlabel = plot:FindFirstChild("PlotSign"):FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("TextLabel")
-		if not textlabel then return end
+		if not plot then continue end
+		
+		local PlotSign = plot:FindFirstChild("PlotSign")
+		if not PlotSign then continue end
+		local SurfaceGui = PlotSign:FindFirstChild("SurfaceGui")
+		if not SurfaceGui then continue end
+		local Frame = SurfaceGui:FindFirstChild("Frame")
+		if not Frame then continue end
+		local textlabel = Frame:FindFirstChild("TextLabel")
+		if not textlabel then continue end
 
 		local playerFromSign = GetPlayerNameFromLabel(textlabel)
 		if player == playerFromSign then
