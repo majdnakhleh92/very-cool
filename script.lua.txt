@@ -264,7 +264,7 @@ local whitelistTextbox = configurations:TextBox({
 	Name = "Whitelist Brainrots",
 	Callback = function(value): string
 		local trimmed = value:match("^%s*(.-)%s*$")
-		if trimmed == "" then Notification() return end
+		if trimmed == "" then return end
 
 		for entry in trimmed:gmatch("[^,]+") do
 			local cleaned = entry:match("^%s*(.-)%s*$")
@@ -307,6 +307,74 @@ local removeWhitelistTextbox = configurations:TextBox({
 	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
 })
 
+configurations:Divider()
+local label17 = configurations:Label("Find brainrots by their mutation! Useful if you are filling up an index") 
+
+local mutationTarget = configurations:TextBox({
+	Name = "Target Mutation",
+	Callback = function(value): string
+		Settings["MutationTarget"] = value
+		Notification("Success!", "Target Mutation set to " .. value)
+	end,
+
+	OnlyNumbers = false,
+	OnLeave = true,
+	ClearTextOnFocus = false,
+	PlaceHolderText = "Cursed, Radioactive, etc"
+})
+
+Settings["TargetBrainrots"] = Settings["TargetBrainrots"] or {}
+local targetedBrainrots = configurations:Paragraph({
+	Title = "Current Targeted Brainrots",
+	Body = table.concat(Settings["TargetBrainrots"], " "),
+})
+
+local targetBrainrotTextbox = configurations:TextBox({
+	Name = "Target Brainrots",
+	Callback = function(value): string
+		local trimmed = value:match("^%s*(.-)%s*$")
+		if trimmed == "" then return end
+
+		for entry in trimmed:gmatch("[^,]+") do
+			local cleaned = entry:match("^%s*(.-)%s*$")
+			if cleaned ~= "" and not table.find(Settings["TargetBrainrots"], cleaned) then
+				table.insert(Settings["TargetBrainrots"], cleaned)
+				Notification("Brainrot included!", "[ " .. cleaned .. " ]")
+			elseif table.find(Settings["TargetBrainrots"], cleaned) then
+				Notification("Already included!", "")
+			end
+		end
+
+		updateParagraph(targetedBrainrots, Settings["TargetBrainrots"])
+	end,
+	OnLeave = true,
+	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
+})
+
+local DetargetTextbox = configurations:TextBox({
+	Name = "Detarget Brainrots",
+	Callback = function(value): string
+		local trimmed = value:match("^%s*(.-)%s*$")
+		if trimmed == "" then Notification() return end
+
+		for entry in trimmed:gmatch("[^,]+") do
+			local cleaned = entry:match("^%s*(.-)%s*$")
+			if cleaned ~= "" then
+				local index = table.find(Settings["TargetBrainrots"], cleaned)
+				if index then
+					table.remove(Settings["TargetBrainrots"], index)
+					Notification("Removed from tagreted brainrots!", "[ " .. cleaned .. " ]")
+				else
+					Notification("Not in tagreted brainrots!", "[ " .. cleaned .. " ]")
+				end
+			end
+		end
+
+		updateParagraph(targetedBrainrots, Settings["TargetBrainrots"])
+	end,
+	OnLeave = true,
+	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
+})
 
 local discordConfiguration = window:Tab({
 	Name = "Discord Configurations",
@@ -447,4 +515,12 @@ end
 
 if Settings["Whitelist"] then
 	updateParagraph(whitelisted, Settings["Whitelist"])
+end
+
+if Settings["TargetBrainrots"] then
+	updateParagraph(targetedBrainrots, Settings["TargetBrainrots"])
+end
+
+if Settings["MutationTarget"] then
+	mutationTarget:SetInput(Settings["MutationTarget"])
 end
