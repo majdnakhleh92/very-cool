@@ -179,6 +179,67 @@ local moneyPerSecond = configurations:TextBox({
 
 configurations:Divider()
 
+local label14 = configurations:Label("Select a region to prioritize - this does not mean it will ignore servers that are not prioritized") 
+
+local dropdown = configurations:Dropdown({
+	Name = "Region Priority",
+	Items = {
+		"New York, USA",
+		"Ashburn, Virginia, USA",
+		"Chicago, USA",
+		"Atlanta, USA",
+		"Miami, USA",
+		"Dallas, Texas, USA",
+		"Los Angeles, California, USA",
+		"San Jose / Palo Alto, California, USA",
+		"Seattle, Washington, USA",
+
+		"London, United Kingdom",
+		"Frankfurt, Germany",
+		"Amsterdam, Netherlands",
+		"Paris, France",
+		"Warsaw, Poland",
+		"Stockholm, Sweden",
+		"Copenhagen, Denmark",
+		"Helsinki, Finland",
+		"Zurich, Switzerland",
+		"Madrid, Spain",
+
+		"Tokyo, Japan",
+		"Singapore",
+		"Seoul, South Korea",
+		"Mumbai, India",
+		"Bangalore, India",
+		"Hong Kong",
+		"Shanghai, China",
+		"Beijing, China",
+
+		"Sydney, Australia",
+
+		"Johannesburg, South Africa",
+		"Cape Town, South Africa",
+		"Cairo, Egypt",
+		"Nairobi, Kenya",
+		"Lagos, Nigeria",
+
+		"São Paulo, Brazil"
+	},
+	Callback = function(value): string
+		print("its a placebo effect easyyyyyy")
+		Settings["RegionPriority"] = value
+	end,
+
+	Alphabetical = true,
+	Default = {},
+	Multiselect = true,
+	Regex = function(itemToClean)
+		local cleanedItem = itemToClean
+		return cleanedItem or itemToClean
+	end
+})
+
+configurations:Divider()
+
 local serverhopSpeed = configurations:Slider({
 	Name = "Delay between server hops",
 	Min = 0,
@@ -523,4 +584,8 @@ end
 
 if Settings["MutationTarget"] then
 	mutationTarget:SetInput(Settings["MutationTarget"])
+end
+
+if Settings["RegionPriority"] then
+	dropdown:SelectItems(Settings["RegionPriority"])
 end
