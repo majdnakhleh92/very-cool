@@ -459,7 +459,7 @@ end
 
 local function Serverhop()
 	local Tried
-	local API, HttpService, TeleportService, CoreGui = nil, game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
+	local HttpService, TeleportService, CoreGui = game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
 	local RemoveErrorPrompts = Settings["RemoveErrorPrompts"] or true --prevents error messages from popping up.
 	local IterationSpeed = Settings["ServerhopSpeed"] or 0.30 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
 	local ExcludefullServers = Settings["ExcludefullServers"] or false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
@@ -528,11 +528,14 @@ local function Serverhop()
 	end
 
 	if RemoveErrorPrompts then 
-		local errorPrompt = CoreGui:FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("ErrorPrompt")
-		if errorPrompt then
-			errorPrompt:Destroy()
-		end
+		local RG = CoreGui:FindFirstChild("RobloxGui")
+		local M = RG and RG:FindFirstChild("Modules")
+		local EP = M and M:FindFirstChild("ErrorPrompt")
 
+		if EP then
+			EP:Destroy()
+		end
+		
 		local RPG = CoreGui:FindFirstChild("RobloxPromptGui")
 		if RPG then
 			RPG:Destroy()
@@ -555,7 +558,7 @@ local function Serverhop()
 					EncodeToFile(NextCursor(JSONData.nextPageCursor))
 					StartTeleport()
 				else
-					SetMainPage() --no more pages left, start over
+					SetMainPage()
 				end
 			end
 		else
