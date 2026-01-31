@@ -153,7 +153,7 @@ local function Anonymousify()
 	local player = game.Players.LocalPlayer	
 	for _, plot in pairs(workspace.Plots:GetChildren()) do
 		if not plot then continue end
-		
+
 		local PlotSign = plot:FindFirstChild("PlotSign")
 		if not PlotSign then continue end
 		local SurfaceGui = PlotSign:FindFirstChild("SurfaceGui")
@@ -332,63 +332,28 @@ local function GetMostValuable(strings, minimum)
 	return meetsMinimum, bestTextLabel, bestString, temp
 end
 
-local function CreateRedLine(surfaceGui)
-	if not surfaceGui then return end
-
-	local Players = game:GetService("Players")
-	local RunService = game:GetService("RunService")
-
-	local player = Players.LocalPlayer
-	local character = player.Character or player.CharacterAdded:Wait()
-	local hrp = character:WaitForChild("HumanoidRootPart")
-
-	local targetPart = surfaceGui.Adornee
-	if not targetPart then return end
-
-	local att0 = Instance.new("Attachment")
-	att0.Parent = hrp
-
-	local att1 = Instance.new("Attachment")
-	att1.Parent = targetPart
-
-	local beam = Instance.new("Beam")
-	beam.Attachment0 = att0
-	beam.Attachment1 = att1
-	beam.Color = ColorSequence.new(Color3.new(0, 0, 1))
-	beam.Width0 = 1
-	beam.Width1 = 1
-	beam.FaceCamera = true
-	beam.Parent = workspace
-
-	RunService.Heartbeat:Connect(function()
-		if targetPart and targetPart.Parent then
-			att1.WorldPosition = targetPart.Position - Vector3.new(0, 10, 0)
-		end
-	end)
-end
-
 local function CheckMutations()
 	local mutation = Settings["MutationTarget"] or ""
 	local Brainrots = Settings["TargetBrainrots"] or {}
 	local MutatedBrainrotFound, Mutation, brainrot
-	
+
 	if mutation == "" and #Brainrots == 0 then return end
-	
+
 	local AnimalOverheadTable = GetAnimalOverhead()
-	
+
 	for _, overhead in pairs(AnimalOverheadTable) do
 		local mutationLabel = overhead:FindFirstChild("Mutation")
 		local Stolen = overhead:FindFirstChild("Stolen")
 		local DisplayName = overhead:FindFirstChild("DisplayName")
-		
+
 		if not DisplayName then continue end
 		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
 		if mutationLabel and mutationLabel.Visible == false then continue end
-		
+
 		if mutationLabel.Text == "Diamond" and DisplayName.Text == "Trippi Troppi" then
 			print("its freaky")
 		end
-		
+
 		if mutationLabel.Text == mutation and table.find(Brainrots, DisplayName.Text) then
 			MutatedBrainrotFound = true
 			Mutation = mutationLabel.Text
@@ -397,7 +362,7 @@ local function CheckMutations()
 			break
 		end
 	end
-	
+
 	return MutatedBrainrotFound, Mutation, brainrot
 end
 
@@ -465,7 +430,7 @@ local function Serverhop()
 	local ExcludefullServers = Settings["ExcludefullServers"] or false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
 	local SaveTeleportAttempts = Settings["SaveTeleportAttempts"] or false --saves every teleports that are attempted in jobid to "Attempts.txt" file
 	local API = Settings["API"] or "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?limit=100"
-	
+
 	if Testing then return end
 	local function EncodeToFile(JSONString)
 		local success, JSONData = pcall(function()
@@ -535,7 +500,7 @@ local function Serverhop()
 		if EP then
 			EP:Destroy()
 		end
-		
+
 		local RPG = CoreGui:FindFirstChild("RobloxPromptGui")
 		if RPG then
 			RPG:Destroy()
@@ -612,7 +577,7 @@ elseif nameFound then
 	end)
 
 	DiscordNotificationNAME(matchedName)
-	
+
 elseif mutatedBrainrotFound then
 	local sound = Instance.new("Sound")
 	sound.SoundId = "rbxassetid://8486683243"
