@@ -5,20 +5,26 @@ local brainrotImages = loadstring(game:HttpGet("https://pastebin.com/raw/i0AJf9G
 local Service = game:GetService("HttpService")
 local hubName = "Garof ServerHopper"
 local Testing = false
+local ME = game.Players.LocalPlayer.Name -- this bot's username
 
 -- ────────────────────────────────────────────
 -- File paths
 -- ────────────────────────────────────────────
-local SERVER_CLAIM_FILE   = hubName .. "\\server_claims.json"   -- { [jobId] = os.time() }
-local BRAINROT_CLAIM_FILE = hubName .. "\\brainrot_claims.json" -- { ["Name|Gen"] = os.time() }
-local SERVERS_FILE        = hubName .. "\\Servers.JSON"
-local FETCH_LOCK          = hubName .. "\\fetch.lock"
-local BRAINROT_EXPIRE     = 300  -- 5 min before same brainrot can be pinged again
-local SERVER_EXPIRE       = 600  -- 10 min before a claimed server is considered abandoned
+local SERVER_CLAIM_FILE   = hubName .. "\\server_claims.json"
+-- structure: { [jobId] = { user = "PlayerName", time = os.time() } }
+
+local BRAINROT_CLAIM_FILE = hubName .. "\\brainrot_claims.json"
+-- structure: { ["Name|Gen"] = os.time() }
+
+local SERVERS_FILE = hubName .. "\\Servers.JSON"
+local CLAIM_LOCK   = hubName .. "\\claim.lock"   -- prevents race when claiming a server
+local FETCH_LOCK   = hubName .. "\\fetch.lock"   -- prevents race when fetching server list
+
+local BRAINROT_EXPIRE = 300  -- 5 min before same brainrot can be pinged again
+local SERVER_EXPIRE   = 120  -- 2 min before a claimed server is considered abandoned
 
 makefolder(hubName)
 
--- Init files if missing
 if not isfile(SERVER_CLAIM_FILE)   then writefile(SERVER_CLAIM_FILE,   Service:JSONEncode({})) end
 if not isfile(BRAINROT_CLAIM_FILE) then writefile(BRAINROT_CLAIM_FILE, Service:JSONEncode({})) end
 
@@ -36,40 +42,108 @@ local function SafeWrite(path, data)
 	pcall(function() writefile(path, Service:JSONEncode(data)) end)
 end
 
-local function CleanExpired(tbl, expireSeconds)
-	local now = os.time()
-	for k, t in pairs(tbl) do
-		if (now - t) > expireSeconds then tbl[k] = nil end
+-- Acquire a simple file lock, wait up to maxWait seconds
+local function AcquireLock(lockFile, maxWait)
+	maxWait = maxWait or 5
+	local waited = 0
+	while isfile(lockFile) do
+		task.wait(0.05)
+		waited += 0.05
+		if waited >= maxWait then
+			pcall(function() delfile(lockFile) end)
+			break
+		end
 	end
-	return tbl
+	writefile(lockFile, ME .. "|" .. tostring(os.time()))
+end
+
+local function ReleaseLock(lockFile)
+	pcall(function() delfile(lockFile) end)
 end
 
 -- ────────────────────────────────────────────
 -- Server claiming
+-- server_claims.json = { [jobId] = { user="name", time=os.time() } }
 -- ────────────────────────────────────────────
-local function ClaimCurrentServer()
+local function LoadServerClaims()
 	local claims = SafeRead(SERVER_CLAIM_FILE)
-	claims = CleanExpired(claims, SERVER_EXPIRE)
-	claims[game.JobId] = os.time()
+	local now = os.time()
+	for jobId, entry in pairs(claims) do
+		if type(entry) ~= "table" or (now - (entry.time or 0)) > SERVER_EXPIRE then
+			claims[jobId] = nil
+		end
+	end
+	return claims
+end
+
+local function SaveServerClaims(claims)
 	SafeWrite(SERVER_CLAIM_FILE, claims)
 end
 
+local function PrintClaims(claims)
+	print("[Claims] Current server ownership:")
+	local any = false
+	for id, entry in pairs(claims) do
+		print("  " .. entry.user .. " -> " .. id)
+		any = true
+	end
+	if not any then print("  (none)") end
+end
+
 local function IsServerClaimed(jobId)
-	local claims = SafeRead(SERVER_CLAIM_FILE)
-	local t = claims[jobId]
-	if t == nil then return false end
-	return (os.time() - t) < SERVER_EXPIRE
+	local claims = LoadServerClaims()
+	local entry = claims[jobId]
+	if not entry then return false end
+	return (os.time() - (entry.time or 0)) < SERVER_EXPIRE
+end
+
+local function IsOurServer(jobId)
+	local claims = LoadServerClaims()
+	local entry = claims[jobId]
+	if not entry then return false end
+	if entry.user ~= ME then return false end
+	return (os.time() - (entry.time or 0)) < SERVER_EXPIRE
+end
+
+-- Atomically try to claim a server — returns true if we got it
+local function TryClaimServer(jobId)
+	AcquireLock(CLAIM_LOCK)
+	local claims = LoadServerClaims()
+	local entry = claims[jobId]
+	local alreadyClaimed = entry and (os.time() - (entry.time or 0)) < SERVER_EXPIRE
+
+	if alreadyClaimed and entry.user ~= ME then
+		ReleaseLock(CLAIM_LOCK)
+		print("[Claims] " .. ME .. " tried to claim " .. jobId .. " but " .. entry.user .. " already has it")
+		return false
+	end
+
+	claims[jobId] = { user = ME, time = os.time() }
+	SaveServerClaims(claims)
+	ReleaseLock(CLAIM_LOCK)
+	print("[Claims] " .. ME .. " claimed server: " .. jobId)
+	PrintClaims(claims)
+	return true
+end
+
+local function RefreshOurClaim(jobId)
+	AcquireLock(CLAIM_LOCK)
+	local claims = LoadServerClaims()
+	if claims[jobId] and claims[jobId].user == ME then
+		claims[jobId].time = os.time()
+		SaveServerClaims(claims)
+	end
+	ReleaseLock(CLAIM_LOCK)
 end
 
 -- ────────────────────────────────────────────
--- Brainrot claiming (so 2 bots dont ping the same one)
--- key = "Name|Gen"
+-- Brainrot claiming
 -- ────────────────────────────────────────────
 local function MakeBrainrotKey(name, gen)
 	return tostring(name) .. "|" .. tostring(gen or "")
 end
 
-local function IsbrainrotClaimed(name, gen)
+local function IsBrainrotClaimed(name, gen)
 	local claims = SafeRead(BRAINROT_CLAIM_FILE)
 	local t = claims[MakeBrainrotKey(name, gen)]
 	if t == nil then return false end
@@ -78,7 +152,10 @@ end
 
 local function ClaimBrainrot(name, gen)
 	local claims = SafeRead(BRAINROT_CLAIM_FILE)
-	claims = CleanExpired(claims, BRAINROT_EXPIRE)
+	local now = os.time()
+	for k, t in pairs(claims) do
+		if (now - t) > BRAINROT_EXPIRE then claims[k] = nil end
+	end
 	claims[MakeBrainrotKey(name, gen)] = os.time()
 	SafeWrite(BRAINROT_CLAIM_FILE, claims)
 end
@@ -169,10 +246,7 @@ local function GetPlayerNameFromLabel(textLabel)
 		for _, PLR in pairs(game.Players:GetPlayers()) do
 			if PLR.Name == playerName or PLR.DisplayName == playerName then return PLR end
 		end
-		return nil
 	end
-	if string.match(text, "^Empty Base$") then return nil end
-	warn("Unexpected base label format: " .. text)
 	return nil
 end
 
@@ -241,7 +315,6 @@ local function GetMostValuable(strings, minimum)
 	end
 
 	if bestValue == -math.huge then return false, nil, nil, {} end
-
 	table.sort(minimumMetTextLabels, function(a, b) return a.value > b.value end)
 
 	local temp = {}
@@ -306,19 +379,19 @@ local function CheckMutations()
 end
 
 -- ────────────────────────────────────────────
--- Discord notifications (return true if ping was sent)
+-- Discord notifications
 -- ────────────────────────────────────────────
 local WEBHOOK = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh"
 
 local function DiscordNotificationCURRENCY(txtlbl, temp)
 	local ovrhead = txtlbl.Parent
-	local anonymous = Settings["anonymity"] == true and "anonymous" or game.Players.LocalPlayer.Name
+	local anonymous = Settings["anonymity"] == true and "anonymous" or ME
 	local bestDisplayName = ovrhead:FindFirstChild("DisplayName")
 	local bestgen = ovrhead:FindFirstChild("Generation")
 	if not bestDisplayName or not bestgen then return false end
 
-	if IsbrainrotClaimed(bestDisplayName.Text, bestgen.Text) then
-		print("Already claimed by another bot: " .. bestDisplayName.Text .. " " .. bestgen.Text)
+	if IsBrainrotClaimed(bestDisplayName.Text, bestgen.Text) then
+		print("[Brainrot] Already claimed: " .. bestDisplayName.Text .. " " .. bestgen.Text)
 		return false
 	end
 	ClaimBrainrot(bestDisplayName.Text, bestgen.Text)
@@ -335,13 +408,13 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 end
 
 local function DiscordNotificationNAME(txtlbl)
-	local anonymous = Settings["anonymity"] == true and "anonymous" or game.Players.LocalPlayer.Name
+	local anonymous = Settings["anonymity"] == true and "anonymous" or ME
 	local overhead = txtlbl.Parent
 	local genLabel = overhead and overhead:FindFirstChild("Generation")
 	local gen = genLabel and genLabel.Text or ""
 
-	if IsbrainrotClaimed(txtlbl.Text, gen) then
-		print("Already claimed by another bot: " .. txtlbl.Text)
+	if IsBrainrotClaimed(txtlbl.Text, gen) then
+		print("[Brainrot] Already claimed: " .. txtlbl.Text)
 		return false
 	end
 	ClaimBrainrot(txtlbl.Text, gen)
@@ -357,10 +430,10 @@ local function DiscordNotificationNAME(txtlbl)
 end
 
 local function DiscordNotificationMUTATION(Mutation, Brainrot)
-	local anonymous = Settings["anonymity"] == true and "anonymous" or game.Players.LocalPlayer.Name
+	local anonymous = Settings["anonymity"] == true and "anonymous" or ME
 
-	if IsbrainrotClaimed(Brainrot, Mutation) then
-		print("Already claimed by another bot: " .. Brainrot .. " " .. Mutation)
+	if IsBrainrotClaimed(Brainrot, Mutation) then
+		print("[Brainrot] Already claimed: " .. Brainrot .. " " .. Mutation)
 		return false
 	end
 	ClaimBrainrot(Brainrot, Mutation)
@@ -377,12 +450,13 @@ end
 
 -- ────────────────────────────────────────────
 -- Serverhop — find an unclaimed server and go there
+-- The CLAIM_LOCK ensures only one bot picks+stamps a server at a time
 -- ────────────────────────────────────────────
 local function Serverhop()
-	local HttpService    = game:GetService("HttpService")
+	local HttpService     = game:GetService("HttpService")
 	local TeleportService = game:GetService("TeleportService")
-	local CoreGui        = game:GetService("CoreGui")
-	local IterationSpeed = Settings["ServerhopSpeed"] or 0.30
+	local CoreGui         = game:GetService("CoreGui")
+	local IterationSpeed  = Settings["ServerhopSpeed"] or 0.30
 	local ExcludefullServers = Settings["ExcludefullServers"] or false
 	local API = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?limit=100"
 
@@ -398,15 +472,11 @@ local function Serverhop()
 	end
 
 	local function FetchPage(cursor)
-		if isfile(FETCH_LOCK) then
-			local waited = 0
-			repeat task.wait(0.1) waited += 0.1 until not isfile(FETCH_LOCK) or waited > 5
-		end
-		writefile(FETCH_LOCK, "1")
+		AcquireLock(FETCH_LOCK)
 		local ok, result = pcall(function()
 			return game:HttpGet(API .. "&excludeFullGames=" .. tostring(ExcludefullServers) .. (cursor and ("&cursor=" .. cursor) or ""))
 		end)
-		pcall(function() delfile(FETCH_LOCK) end)
+		ReleaseLock(FETCH_LOCK)
 		return ok and result or nil
 	end
 
@@ -431,15 +501,47 @@ local function Serverhop()
 	local JSONData = LoadOrFetchServers()
 
 	while true do
-		-- Always re-read from disk so all bots see the latest state
+		-- Pick and atomically claim a server inside the lock
+		local picked = nil
+
+		AcquireLock(CLAIM_LOCK)
+
+		-- Re-read both files inside the lock for freshest state
 		if isfile(SERVERS_FILE) then
 			local ok, fresh = pcall(function() return HttpService:JSONDecode(readfile(SERVERS_FILE)) end)
-			if ok and fresh and fresh.gameId == game.PlaceId then
-				JSONData = fresh
+			if ok and fresh and fresh.gameId == game.PlaceId then JSONData = fresh end
+		end
+
+		if JSONData and JSONData.data and #JSONData.data > 0 then
+			local claims = LoadServerClaims()
+			for i, server in ipairs(JSONData.data) do
+				local entry = claims[server.id]
+				local isFree = not entry or (os.time() - (entry.time or 0)) >= SERVER_EXPIRE
+				if isFree then
+					picked = server.id
+					-- Stamp our claim immediately inside the lock
+					claims[picked] = { user = ME, time = os.time() }
+					SaveServerClaims(claims)
+					-- Remove from shared list so others skip it
+					table.remove(JSONData.data, i)
+					JSONData.gameId = game.PlaceId
+					SafeWrite(SERVERS_FILE, JSONData)
+					print("[" .. ME .. "] Picked server: " .. picked)
+					PrintClaims(claims)
+					break
+				end
 			end
 		end
 
-		if not JSONData or not JSONData.data or #JSONData.data == 0 then
+		ReleaseLock(CLAIM_LOCK)
+
+		if picked then
+			TeleportService:TeleportToPlaceInstance(game.PlaceId, picked, game.Players.LocalPlayer)
+			task.wait(IterationSpeed)
+			return
+		else
+			-- Page exhausted or all claimed — fetch next page
+			print("[" .. ME .. "] All servers on page claimed, fetching next...")
 			local cursor = JSONData and JSONData.nextPageCursor or nil
 			local raw = FetchPage(cursor)
 			if raw then
@@ -451,63 +553,36 @@ local function Serverhop()
 				end
 			end
 			task.wait(0.5)
-			continue
-		end
-
-		-- Find first unclaimed server
-		local picked = nil
-		for i, server in ipairs(JSONData.data) do
-			if not IsServerClaimed(server.id) then
-				picked = server.id
-				table.remove(JSONData.data, i)
-				JSONData.gameId = game.PlaceId
-				SafeWrite(SERVERS_FILE, JSONData)
-				break
-			end
-		end
-
-		if picked then
-			-- Stamp as claimed before teleport so other bots skip it immediately
-			local claims = SafeRead(SERVER_CLAIM_FILE)
-			claims = CleanExpired(claims, SERVER_EXPIRE)
-			claims[picked] = os.time()
-			SafeWrite(SERVER_CLAIM_FILE, claims)
-
-			print("Teleporting to unclaimed server: " .. picked)
-			TeleportService:TeleportToPlaceInstance(game.PlaceId, picked, game.Players.LocalPlayer)
-			task.wait(IterationSpeed)
-			return
-		else
-			-- All servers on current page claimed, force a fresh page fetch
-			print("All servers on page claimed, fetching next page...")
-			JSONData.data = {}
-			task.wait(0.1)
 		end
 	end
 end
 
 -- ────────────────────────────────────────────
--- Main — claim this server then monitor it forever
+-- Main — try to claim this server, monitor if successful
 -- ────────────────────────────────────────────
 local minimum = tonumber(Settings["MoneyPerSecond"]) or 10_000_000
 
--- If another bot already claimed this server, move on
-if IsServerClaimed(game.JobId) then
-	print("Server already claimed by another bot — finding a new one...")
+-- Stagger startup slightly so bots dont all hit the lock at the exact same millisecond
+task.wait(math.random() * 1.5)
+
+local claimed = TryClaimServer(game.JobId)
+
+if not claimed then
+	print("[" .. ME .. "] Server already taken — finding a different one...")
+	task.wait(0.2 + math.random() * 0.5)
 	Serverhop()
 	return
 end
 
--- Claim it for ourselves
-ClaimCurrentServer()
+-- We own this server — settle in
 Anonymousify()
-print("Bot settled in server: " .. game.JobId .. " — monitoring...")
+print("[" .. ME .. "] Settled in server: " .. game.JobId .. " — monitoring every 3s")
 
--- Keep the claim alive every 30s so it doesn't expire
+-- Keep claim alive every 30s so it doesnt expire while we're sitting here
 task.spawn(function()
 	while true do
 		task.wait(30)
-		ClaimCurrentServer()
+		RefreshOurClaim(game.JobId)
 	end
 end)
 
@@ -526,6 +601,14 @@ end
 while true do
 	task.wait(SCAN_INTERVAL)
 
+	-- Safety check: verify we still own this server every scan
+	if not IsOurServer(game.JobId) then
+		print("[" .. ME .. "] Lost ownership of " .. game.JobId .. " — moving to a new server...")
+		task.wait(0.2 + math.random() * 0.5)
+		Serverhop()
+		return
+	end
+
 	local meetsMinimum, _, currencyTextLabel, temp = CheckCurrency(minimum)
 	local nameFound, matchedName = CheckNames()
 	local mutatedBrainrotFound, mutation, brainrot = CheckMutations()
@@ -536,14 +619,12 @@ while true do
 			Settings["Server Count"] += 1
 			SaveSettings()
 		end
-
 	elseif nameFound and matchedName then
 		if DiscordNotificationNAME(matchedName) then
 			PlaySound()
 			Settings["Server Count"] += 1
 			SaveSettings()
 		end
-
 	elseif mutatedBrainrotFound then
 		if DiscordNotificationMUTATION(mutation, brainrot) then
 			PlaySound()
