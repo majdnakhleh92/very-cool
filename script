@@ -3,7 +3,7 @@ local StarterGui = game:GetService("StarterGui")
 local webhookUtil = loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
 local brainrotImages = loadstring(game:HttpGet("https://pastebin.com/raw/i0AJf9G9"))()
 local Service = game:GetService("HttpService")
-local hubName = "Garof ServerHopper" -- idk it ain a hub lmao
+local hubName = "Garof ServerHopper"
 local Testing = false
 
 if started and not Testing then
@@ -30,7 +30,7 @@ game.Players.LocalPlayer.OnTeleport:Connect(function(state)
 	if state ~= Enum.TeleportState.Started and state ~= Enum.TeleportState.InProgress then return end
 
 	queue_on_teleport([[
-		print(1) -- rlly hope this doesnt break bro
+		print(1)
 
 		repeat
 			task.wait()
@@ -94,6 +94,88 @@ local Settings = {}
 
 makefolder(hubName)
 
+-- ────────────────────────────────────────────
+-- Shared server tracking (same PC, all accounts)
+-- { [jobId] = tickTime } 
+-- If tickTime is nil -> never joined, allowed
+-- If tickTime is present and < 120s old -> skip
+-- If tickTime is present and >= 120s old -> allowed again
+-- ────────────────────────────────────────────
+local CLAIM_FILE = hubName .. "\\claimed_servers.json"
+local JOIN_EXPIRE = 120 -- seconds before a joined server is allowed again
+
+-- Create the claim file if it doesn't exist yet
+if not isfile(CLAIM_FILE) then
+	writefile(CLAIM_FILE, Service:JSONEncode({}))
+end
+
+local function LoadTracked()
+	if not isfile(CLAIM_FILE) then return {} end
+	local success, data = pcall(function()
+		return Service:JSONDecode(readfile(CLAIM_FILE))
+	end)
+	if success and data then return data end
+	return {}
+end
+
+local function SaveTracked(data)
+	writefile(CLAIM_FILE, Service:JSONEncode(data))
+end
+
+local function IsServerAllowed(jobId)
+	local tracked = LoadTracked()
+	local entry = tracked[jobId]
+	if entry == nil then return true end -- never seen, allowed
+	return (tick() - entry) >= JOIN_EXPIRE -- allowed if 120s has passed
+end
+
+local function MarkServerJoined(jobId)
+	local tracked = LoadTracked()
+	tracked[jobId] = tick()
+	-- Clean up old entries (older than 5 minutes) so file doesnt grow forever
+	for id, t in pairs(tracked) do
+		if (tick() - t) > 300 then
+			tracked[id] = nil
+		end
+	end
+	SaveTracked(tracked)
+end
+
+local function TryClaimAndGetServer(JSONData)
+	local tracked = LoadTracked()
+
+	-- Find first server that isn't blocked
+	for i, server in ipairs(JSONData.data) do
+		local JobId = server.id
+		local entry = tracked[JobId]
+		local allowed = (entry == nil) or ((tick() - entry) >= JOIN_EXPIRE)
+
+		if allowed then
+			-- Claim it by marking it with current tick immediately
+			tracked[JobId] = tick()
+			-- Clean up old entries while we're here
+			for id, t in pairs(tracked) do
+				if (tick() - t) > 300 then
+					tracked[id] = nil
+				end
+			end
+			SaveTracked(tracked)
+
+			-- Remove from server list so next account reading the file skips it
+			table.remove(JSONData.data, i)
+			local ok, encoded = pcall(function()
+				return Service:JSONEncode(JSONData)
+			end)
+			if ok then writefile("Servers.JSON", encoded) end
+
+			return JobId
+		end
+	end
+
+	return nil -- All servers on current page are blocked
+end
+-- ────────────────────────────────────────────
+
 function SaveSettings()
 	local JSON = Service:JSONEncode(Settings)
 	writefile(hubName .. "\\configName.cfg", JSON)
@@ -130,11 +212,9 @@ local function GetPlayerNameFromLabel(textLabel)
 		end
 		return nil
 	else
-
 		if string.match(text, "^Empty Base$") then
 			return nil
 		else
-
 			warn("Unexpected base label format: " .. text)
 			return nil
 		end
@@ -171,7 +251,6 @@ local function Anonymousify()
 end
 
 local function DiscordNotificationCURRENCY(txtlbl, temp)
-
 	local ovrhead = txtlbl.Parent
 	local anonymous = game.Players.LocalPlayer.Name
 	local bestDisplayName = ovrhead:FindFirstChild("DisplayName")
@@ -204,7 +283,6 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 end
 
 local function DiscordNotificationNAME(txtlbl: TextLabel)
-
 	local anonymous = game.Players.LocalPlayer.Name
 
 	if Settings["anonymity"] == true then anonymous = "anonymous" end
@@ -424,14 +502,15 @@ end
 
 local function Serverhop()
 	local Tried
-	local HttpService, TeleportService, CoreGui = game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
-	local RemoveErrorPrompts = Settings["RemoveErrorPrompts"] or true --prevents error messages from popping up.
-	local IterationSpeed = Settings["ServerhopSpeed"] or 0.30 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
-	local ExcludefullServers = Settings["ExcludefullServers"] or false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
-	local SaveTeleportAttempts = Settings["SaveTeleportAttempts"] or false --saves every teleports that are attempted in jobid to "Attempts.txt" file
+	local HttpService, TeleportService, CoreGui = game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui")
+	local RemoveErrorPrompts = Settings["RemoveErrorPrompts"] or true
+	local IterationSpeed = Settings["ServerhopSpeed"] or 0.30
+	local ExcludefullServers = Settings["ExcludefullServers"] or false
+	local SaveTeleportAttempts = Settings["SaveTeleportAttempts"] or false
 	local API = Settings["API"] or "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?limit=100"
 
 	if Testing then return end
+
 	local function EncodeToFile(JSONString)
 		local success, JSONData = pcall(function()
 			return HttpService:JSONDecode(JSONString)
@@ -464,24 +543,39 @@ local function Serverhop()
 		if not JSONData then
 			writefile("Servers.JSON", game:HttpGet(API))
 			StartTeleport()
+			return
 		end
+
 		for i = 0, 99 do
-			if #JSONData.data <= 1 then
-				EncodeToFile(NextCursor(JSONData.nextPageCursor))
-				TeleportService:Teleport(game.PlaceId, game.Players.LocalPlayer)
+			-- Refetch fresh copy from disk each iteration so all accounts stay in sync
+			local ok, freshData = pcall(function()
+				return HttpService:JSONDecode(readfile("Servers.JSON"))
+			end)
+			if ok and freshData then
+				JSONData = freshData
 			end
-			if JSONData.data[i] then
-				local JobId = JSONData.data[i].id
-				table.remove(JSONData.data, i)
-				local sucess, encoded = pcall(function()
-					return HttpService:JSONEncode(JSONData)
+
+			if not JSONData.data or #JSONData.data <= 1 then
+				EncodeToFile(NextCursor(JSONData.nextPageCursor))
+				-- re-read after writing new page
+				local ok2, newData = pcall(function()
+					return HttpService:JSONDecode(readfile("Servers.JSON"))
 				end)
-				writefile("Servers.JSON", encoded)
+				if ok2 and newData then JSONData = newData end
+			end
+
+			local JobId = TryClaimAndGetServer(JSONData)
+
+			if JobId then
 				if SaveTeleportAttempts then
 					appendfile("Attempts.txt", JobId .. "\n")
 				end
+				MarkServerJoined(JobId) -- stamp it as joined right before teleport
 				TeleportService:TeleportToPlaceInstance(game.PlaceId, JobId, game.Players.LocalPlayer)
 				task.wait(IterationSpeed)
+			else
+				-- All servers on this page claimed, wait briefly then refresh
+				task.wait(0.1)
 			end
 		end
 	end
@@ -539,64 +633,53 @@ local function Serverhop()
 	end
 end
 
+-- ────────────────────────────────────────────
+-- Main logic
+-- ────────────────────────────────────────────
 local minimum = tonumber(Settings["MoneyPerSecond"]) or 10_000_000
 local nameFound, matchedName = CheckNames()
 local meetsMinimum, highestAmount, currencyTextLabel, temp = CheckCurrency(minimum)
 local mutatedBrainrotFound, mutation, brainrot = CheckMutations()
-
-local hasMatch = meetsMinimum or nameFound
-local mainScript = Settings["HubtoLoad"] or "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
 
 if meetsMinimum then
 	local sound = Instance.new("Sound")
 	sound.SoundId = "rbxassetid://8486683243"
 	sound.Volume = 3
 	sound.Looped = false
-	sound.Parent = game.SoundService 
+	sound.Parent = game.SoundService
 	sound:Play()
 
 	Anonymousify()
-	task.spawn(function()
-		if Testing then return end
-		loadstring(game:HttpGet("https://pastebin.com/raw/Begkf2Gj"))()
-		loadstring(game:HttpGet("https://pastebin.com/raw/NP5VGcP6"))()
-	end)
-
 	DiscordNotificationCURRENCY(currencyTextLabel, temp)
+	task.wait(5)
+	Serverhop()
 
 elseif nameFound then
 	local sound = Instance.new("Sound")
 	sound.SoundId = "rbxassetid://8486683243"
 	sound.Volume = 3
 	sound.Looped = false
-	sound.Parent = game.SoundService 
+	sound.Parent = game.SoundService
 	sound:Play()
 
 	Anonymousify()
-	task.spawn(function()
-		if Testing then return end
-		loadstring(game:HttpGet("https://pastebin.com/raw/Begkf2Gj"))()
-		loadstring(game:HttpGet("https://pastebin.com/raw/NP5VGcP6"))()
-	end)
-
 	DiscordNotificationNAME(matchedName)
+	task.wait(5)
+	Serverhop()
 
 elseif mutatedBrainrotFound then
 	local sound = Instance.new("Sound")
 	sound.SoundId = "rbxassetid://8486683243"
 	sound.Volume = 3
 	sound.Looped = false
-	sound.Parent = game.SoundService 
+	sound.Parent = game.SoundService
 	sound:Play()
 
 	Anonymousify()
-	task.spawn(function()
-		if Testing then return end
-		loadstring(game:HttpGet("https://pastebin.com/raw/Begkf2Gj"))()
-		loadstring(game:HttpGet("https://pastebin.com/raw/NP5VGcP6"))()
-	end)
-
 	DiscordNotificationMUTATION(mutation, brainrot)
+	task.wait(5)
+	Serverhop()
+
 else
 	Settings["Server Count"] += 1
 	SaveSettings()
