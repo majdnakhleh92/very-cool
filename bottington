@@ -6,17 +6,6 @@ local Service = game:GetService("HttpService")
 local hubName = "Garof ServerHopper"
 local Testing = false
 
-local old
-old = hookfunction(debug.info, newcclosure(function(l, w, ...)
-	local r = old(l, w, ...)
-	if type(l) == "number" and w == "s" and l == 3 then
-		if r == "[C]" or (type(r) == "string" and not r:find(".", 1, true)) then
-			return "ReplicatedStorage.Controllers.EventController"
-		end
-	end
-	return r
-end))
-
 local Syncronizer = require(game:GetService("ReplicatedStorage").Packages:WaitForChild("Synchronizer"))
 local AnimalsShared = require(game.ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Animals"))
 
