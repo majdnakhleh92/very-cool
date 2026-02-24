@@ -172,7 +172,7 @@ local Priority = Settings["Whitelist"] or {"Nooo my Hotspot", "Raccooni Jandelin
 local function GetAnimalOverhead()
 	local animalOverheadTable = {}
 
-	for _, SurfaceGui in pairs(workspace:GetDescendants()) do
+	for _, SurfaceGui in pairs(workspace.Debris:GetDescendants()) do
 		if SurfaceGui:IsA("SurfaceGui") and SurfaceGui.Name == "AnimalOverhead" then
 			table.insert(animalOverheadTable, SurfaceGui)
 		end
@@ -238,6 +238,52 @@ local function GetMostValuable(strings, minimum)
 	return meetsMinimum, bestTextLabel, bestString, temp
 end
 
+local function GetPlayerNameFromLabel(textLabel)
+	if not textLabel or not textLabel:IsA("TextLabel") or not textLabel.Text then
+		return nil
+	end
+
+	local text = textLabel.Text
+	local playerName = string.match(text, "^(.+)'s Base$")
+
+	if playerName then
+		for _, PLR in pairs(game.Players:GetPlayers()) do
+			if PLR.Name == playerName or PLR.DisplayName == playerName then
+				return PLR
+			end
+		end
+		return nil
+	else
+
+		if string.match(text, "^Empty Base$") then
+			return nil
+		else
+
+			warn("Unexpected base label format: " .. text)
+			return nil
+		end
+	end
+end
+
+
+local function HasOwner(part)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = {part}
+
+	local raycast = workspace:Raycast(part.Position, Vector3.new(0, -100, 0), params)
+	if raycast and raycast.Instance then
+
+		for _, Plot in workspace.Plots:GetChildren() do
+			if raycast.Instance:IsDescendantOf(Plot) then
+				return GetPlayerNameFromLabel(Plot.PlotSign.SurfaceGui.Frame.TextLabel)
+			end
+		end
+	else 
+		return nil
+	end
+end
+
 local function CheckCurrency(minimum)
 	local valuetable = {}
 	local AnimalOverheadTabel = GetAnimalOverhead()
@@ -246,13 +292,15 @@ local function CheckCurrency(minimum)
 		local Stolen = overhead:FindFirstChild("Stolen")
 		local displayName = overhead:FindFirstChild("DisplayName")
 		local gen = overhead:FindFirstChild("Generation")
+		local owner = HasOwner(overhead.Parent)
 
-		if Stolen and (Stolen.Text == "FUSING" or Stolen.Text == "IN DUEL") and Stolen.Visible == true then 
+		if not owner then print("no owner buster") continue end
+		local illegalNames = {"IN DUEL", "FUSING", "READY!"}
+		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then 
 			continue 
 		end
 
 		if not gen then continue end
-
 		if displayName and table.find(blacklist, displayName.Text) then 
 			print("Blacklisted: " .. displayName.Text)
 			continue 
@@ -411,7 +459,7 @@ while task.wait(math.random(2, 4)) do
 	if Claimed then
 		Bots[player.Name] = game.JobId
 		SaveBots()
-		
+
 		local meetsMinimum, highestAmount, currencyTextLabel, temp = CheckCurrency(minimum)
 		if meetsMinimum then
 			local tbl =  {}
