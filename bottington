@@ -471,7 +471,8 @@ while task.wait(math.random(2, 4)) do
 			end
 			if next(tbl) == nil then continue end
 			if not Bots["Servers"] then Bots["Servers"] = {} end
-			table.insert(Bots["Servers"], game.JobId)
+			table.insert(Bots["Servers"], game.JobId
+			SaveBots()
 			DiscordNotificationCURRENCY(currencyTextLabel, tbl)
 		end
 	else
