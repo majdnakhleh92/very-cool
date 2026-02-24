@@ -146,7 +146,7 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 	local description = "**⚠︎ Other Brainrots**\n```" .. table.concat(temp, "\n") .. "```"
 	if Settings["anonymity"] == true then anonymous = "anonymous" end
 	local myMessage = webhookUtil.createMessage({
-		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
+		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh?wait=true",
 		username = "Script Logs",
 		content = "A good server found by: " .. anonymous
 	})
@@ -163,9 +163,10 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 		embed1.addField("Server Id", game.JobId, false)
 	end
 
-	myMessage.sendMessage()
+	local response = myMessage.sendMessage()
+	local body = Service:JSONDecode(response.Body)
 	ResetSettings()
-	return
+	return body
 end
 
 local blacklist = Settings["Blacklist"] or {"La Grande Combinasion", "Los Nooo My Hotspotsitos", "Bunito Bunito Spinito", "Horegini Boom", "Lucky Block", "Giftini Spyderini", "Santa Hotspot", "Naughty Naughty", "Los Cucarachas", "La Cucaracha", "Pot Hotspot", "Los 25", "Ho Ho Ho Sahur", "To to to Sahur", "Chimnino", "Graipuss Medussi", "Rocco Disco", "Triplito Tralaleritos", "La Vacca Prese Presente", "Los Tralaleritos", "Guerriro Digitale", "Noo my Present", "Las Tralaleritas", "Los Tortus", "Job Job Job Sahur", "Los Burritos", "Los Jobcitos", "Burrito Bandito", "Quesadilla Crocodila", "Los Quesadillas", "Tung Tung Tung Sahur", "Cuadramat and Pakrahmatmamat", "List List List Sahur", "Chicleteirina Bicicleteirina"}
@@ -181,6 +182,56 @@ local function GetAnimalOverhead()
 	end
 
 	return animalOverheadTable
+end
+
+local function GetPlayerNameFromLabel(textLabel)
+	if not textLabel or not textLabel:IsA("TextLabel") or not textLabel.Text then
+		return nil
+	end
+
+	local text = textLabel.Text
+	local playerName = string.match(text, "^(.+)'s Base$")
+
+	if playerName then
+		for _, PLR in pairs(game.Players:GetPlayers()) do
+			if PLR.Name == playerName or PLR.DisplayName == playerName then
+				return PLR
+			end
+		end
+		return nil
+	else
+
+		if string.match(text, "^Empty Base$") then
+			return nil
+		else
+
+			warn("Unexpected base label format: " .. text)
+			return nil
+		end
+	end
+end
+
+local function HasOwner(part)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = {part}
+
+	local raycast = workspace:Raycast(part.Position, Vector3.new(0, -100, 0), params)
+	if raycast and raycast.Instance then
+
+		for _, Plot in workspace.Plots:GetChildren() do
+			if raycast.Instance:IsDescendantOf(Plot) then
+				if not Plot:FindFirstChild("PlotSign") then continue end
+				if not Plot.PlotSign:FindFirstChild("SurfaceGui") then continue end
+				if not Plot.PlotSign.SurfaceGui:FindFirstChild("Frame") then continue end
+				if not Plot.PlotSign.SurfaceGui.Frame:FindFirstChild("TextLabel") then continue end
+
+				return GetPlayerNameFromLabel(Plot.PlotSign.SurfaceGui.Frame.TextLabel)
+			end
+		end
+	else 
+		return nil
+	end
 end
 
 local function GetMostValuable(strings, minimum)
@@ -235,60 +286,10 @@ local function GetMostValuable(strings, minimum)
 	end
 
 	local meetsMinimum = bestValue >= minimum
+	local owner = HasOwner(bestTextLabel.Parent.Parent)
 	print(string.format("Highest value: %d, Minimum: %d, Meets minimum: %s", bestValue, minimum, tostring(meetsMinimum)))
 
-	return meetsMinimum, bestTextLabel, bestString, temp
-end
-
-local function GetPlayerNameFromLabel(textLabel)
-	if not textLabel or not textLabel:IsA("TextLabel") or not textLabel.Text then
-		return nil
-	end
-
-	local text = textLabel.Text
-	local playerName = string.match(text, "^(.+)'s Base$")
-
-	if playerName then
-		for _, PLR in pairs(game.Players:GetPlayers()) do
-			if PLR.Name == playerName or PLR.DisplayName == playerName then
-				return PLR
-			end
-		end
-		return nil
-	else
-
-		if string.match(text, "^Empty Base$") then
-			return nil
-		else
-
-			warn("Unexpected base label format: " .. text)
-			return nil
-		end
-	end
-end
-
-
-local function HasOwner(part)
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = {part}
-
-	local raycast = workspace:Raycast(part.Position, Vector3.new(0, -100, 0), params)
-	if raycast and raycast.Instance then
-
-		for _, Plot in workspace.Plots:GetChildren() do
-			if raycast.Instance:IsDescendantOf(Plot) then
-				if not Plot:FindFirstChild("PlotSign") then continue end
-				if not Plot.PlotSign:FindFirstChild("SurfaceGui") then continue end
-				if not Plot.PlotSign.SurfaceGui:FindFirstChild("Frame") then continue end
-				if not Plot.PlotSign.SurfaceGui.Frame:FindFirstChild("TextLabel") then continue end
-				
-				return GetPlayerNameFromLabel(Plot.PlotSign.SurfaceGui.Frame.TextLabel)
-			end
-		end
-	else 
-		return nil
-	end
+	return meetsMinimum, bestTextLabel, bestString, temp, owner
 end
 
 local function CheckCurrency(minimum)
@@ -316,8 +317,8 @@ local function CheckCurrency(minimum)
 		table.insert(valuetable, gen)
 	end
 
-	local meetsMinimum, textlabel, amount, minimumMetTextLabels = GetMostValuable(valuetable, minimum)
-	return meetsMinimum, amount, textlabel, minimumMetTextLabels
+	local meetsMinimum, textlabel, amount, minimumMetTextLabels, owner = GetMostValuable(valuetable, minimum)
+	return meetsMinimum, amount, textlabel, minimumMetTextLabels, owner
 end
 
 local function CheckIfClaimed()
@@ -337,6 +338,35 @@ end
 local function CheckIfProccessed(brainrot, Table)
 	if Table[brainrot] and (tick() - Table[brainrot]) < 160 then return true end
 	return false
+end
+
+local function EditPlayerLeft(plr, body)
+	if not plr or not body then return end
+	local joinTime = os.time()
+	local webhookUrl = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh"
+
+	local con
+	con = game.Players.PlayerRemoving:Connect(function(removedPlr)
+		if removedPlr ~= plr then return end
+		con:Disconnect()
+
+		local duration = os.time() - joinTime
+		body.embeds[1].color = 0xFF0000
+		table.insert(body.embeds[1].fields, {
+			name = "Player Has Left The Server",
+			value = string.format("%dm %ds", math.floor(duration / 60), duration % 60),
+			inline = false
+		})
+
+		pcall(function()
+			request({
+				Url = webhookUrl .. "/messages/" .. body.id,
+				Method = "PATCH",
+				Headers = {["Content-Type"] = "application/json"},
+				Body = Service:JSONEncode({ embeds = body.embeds })
+			})
+		end)
+	end)
 end
 
 local function Serverhop()
@@ -467,7 +497,7 @@ while task.wait(math.random(2, 4)) do
 		Bots[player.Name] = game.JobId
 		SaveBots()
 
-		local meetsMinimum, highestAmount, currencyTextLabel, temp = CheckCurrency(minimum)
+		local meetsMinimum, highestAmount, currencyTextLabel, temp, owner = CheckCurrency(minimum)
 		if meetsMinimum then
 			local tbl =  {}
 			for _, v in temp do
@@ -480,7 +510,8 @@ while task.wait(math.random(2, 4)) do
 			if not Bots["Servers"] then Bots["Servers"] = {} end
 			Bots["Servers"][game.JobId] = os.time()
 			SaveBots()
-			DiscordNotificationCURRENCY(currencyTextLabel, tbl)
+			local body = DiscordNotificationCURRENCY(currencyTextLabel, tbl)
+			EditPlayerLeft(owner, body)
 		end
 	else
 		Bots[player.Name] = nil
