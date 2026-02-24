@@ -276,6 +276,11 @@ local function HasOwner(part)
 
 		for _, Plot in workspace.Plots:GetChildren() do
 			if raycast.Instance:IsDescendantOf(Plot) then
+				if not Plot:FindFirstChild("PlotSign") then continue end
+				if not Plot.PlotSign:FindFirstChild("SurfaceGui") then continue end
+				if not Plot.PlotSign.SurfaceGui:FindFirstChild("Frame") then continue end
+				if not Plot.PlotSign.SurfaceGui.Frame:FindFirstChild("TextLabel") then continue end
+				
 				return GetPlayerNameFromLabel(Plot.PlotSign.SurfaceGui.Frame.TextLabel)
 			end
 		end
