@@ -102,7 +102,8 @@ end
 
 function LoadSettings()
 	if isfile(hubName .. "\\configName.cfg") then
-		Settings = Service:JSONDecode(readfile(hubName .. "\\configName.cfg"))
+		local success, result = pcall(function() return Service:JSONDecode(readfile(hubName .. "\\configName.cfg")) end)
+		if success then Settings = result end
 	end
 end
 
@@ -113,7 +114,8 @@ end
 
 function LoadBots()
 	if isfile(hubName .. "\\Bots.cfg") then
-		Bots = Service:JSONDecode(readfile(hubName .. "\\Bots.cfg"))
+		local success, result = pcall(function() return Service:JSONDecode(readfile(hubName .. "\\Bots.cfg")) end)
+		if success then Bots = result end
 	end
 end
 
