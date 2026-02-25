@@ -164,8 +164,7 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 	)
 
 	if anonymous ~= "anonymous" then
-		embed1.addField("Server Id", game.JobId, false)
-		embed1.addField("Join Link", GetJoinLink(), false)
+		embed1.addField("Join Link", "[Click Here To join](" .. GetJoinLink() .. ")", false)
 	end
 
 	local response = myMessage.sendMessage()
@@ -491,7 +490,7 @@ local function Serverhop()
 	end
 end
 
-local minimum = tonumber(Settings["MoneyPerSecond"]) or 10_000_000
+local minimum = tonumber(Settings["MoneyPerSecond"]) or 10
 local mainScript = Settings["HubtoLoad"] or "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
 local Proccessed = {}
 while task.wait(math.random(2, 4)) do
@@ -502,7 +501,7 @@ while task.wait(math.random(2, 4)) do
 		Bots[player.Name] = game.JobId
 		SaveBots()
 
-		local meetsMinimum, highestAmount, currencyTextLabel, temp, owner = CheckCurrency(minimum)
+		local meetsMinimum, highestAmount, currencyTextLabel, temp, owner = CheckCurrency(10)
 		if meetsMinimum then
 			local tbl =  {}
 			for _, v in temp do
