@@ -336,7 +336,7 @@ local function CheckIfClaimed()
 end
 
 local function CheckIfProccessed(brainrot, Table)
-	if Table[brainrot] and (tick() - Table[brainrot]) < 160 then return true end
+	if Table[brainrot] and (tick() - Table[brainrot]) < 300 then return true end
 	return false
 end
 
