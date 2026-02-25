@@ -490,7 +490,7 @@ local function Serverhop()
 	end
 end
 
-local minimum = tonumber(Settings["MoneyPerSecond"]) or 10
+local minimum = tonumber(Settings["MoneyPerSecond"]) or 10_000_000
 local mainScript = Settings["HubtoLoad"] or "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
 local Proccessed = {}
 while task.wait(math.random(2, 4)) do
@@ -501,7 +501,7 @@ while task.wait(math.random(2, 4)) do
 		Bots[player.Name] = game.JobId
 		SaveBots()
 
-		local meetsMinimum, highestAmount, currencyTextLabel, temp, owner = CheckCurrency(10)
+		local meetsMinimum, highestAmount, currencyTextLabel, temp, owner = CheckCurrency(minimum)
 		if meetsMinimum then
 			local tbl =  {}
 			for _, v in temp do
