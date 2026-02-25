@@ -136,6 +136,10 @@ local function GetBrainrotUrl(name)
 	return nil
 end
 
+local function GetJoinLink()
+	return string.format("https://www.roblox.com/games/start?placeId=%s&gameInstanceId=%s", game.PlaceId, game.JobId)
+end
+
 local function DiscordNotificationCURRENCY(txtlbl, temp)
 
 	local ovrhead = txtlbl.Parent
@@ -161,6 +165,7 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 
 	if anonymous ~= "anonymous" then
 		embed1.addField("Server Id", game.JobId, false)
+		embed1.addField("Join Link", GetJoinLink(), false)
 	end
 
 	local response = myMessage.sendMessage()
