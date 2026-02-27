@@ -405,6 +405,7 @@ local function CloseBot()
 		Bots[player.Name] = game.JobId
 		Bots["Servers"] = {}
 		SaveBots()
+		RemoveServer()
 		game:Shutdown()
 	end
 end
