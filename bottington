@@ -149,10 +149,10 @@ local function ReturnPingRoles(tbl)
 			total = total + tonumber(num)
 		end
 	end
-	if not total then return end
+	if not total then return "" end
 	
 	if total < 100 then
-		return
+		return ""
 	elseif total < 500 then
 		return "<@1476593217599439012> "
 	elseif total > 1000 then
