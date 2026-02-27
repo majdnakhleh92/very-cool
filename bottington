@@ -594,6 +594,7 @@ while task.wait(math.random(2, 4)) do
 	local player = game.Players.LocalPlayer
 	local Claimed = CheckIfClaimed()
 	if Claimed then
+		Claim()
 		local meetsMinimum, highestAmount, currencyTextLabel, temp, owner = CheckCurrency(minimum)
 		if meetsMinimum then
 			local tbl =  {}
