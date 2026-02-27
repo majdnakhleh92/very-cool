@@ -3,6 +3,7 @@ local StarterGui = game:GetService("StarterGui")
 local webhookUtil = loadstring(game:HttpGet("https://pastebin.com/raw/fpkbJgyq"))()
 local brainrotImages = loadstring(game:HttpGet("https://pastebin.com/raw/i0AJf9G9"))()
 local Service = game:GetService("HttpService")
+local serverUrl = "https://myscript-4zvx.onrender.com"
 local hubName = "Garof ServerHopper" -- idk it ain a hub lmao
 local Testing = false
 
@@ -140,19 +141,37 @@ local function GetJoinLink()
 	return string.format("https://www.roblox.com/games/start?placeId=%s&gameInstanceId=%s", game.PlaceId, game.JobId)
 end
 
+local function ReturnPingRoles(tbl)
+	local total = 0
+	for _, s in ipairs(tbl) do
+		local num = s:match("%$([%d%.]+)M")
+		if num then
+			total = total + tonumber(num)
+		end
+	end
+	if not total then return end
+	
+	if total < 100 then
+		return
+	elseif total < 500 then
+		return "<@1476593217599439012> "
+	elseif total > 1000 then
+		return "<@1476593217599439012> <@1476593349841391828> "
+	end
+end
+
 local function DiscordNotificationCURRENCY(txtlbl, temp)
 
 	local ovrhead = txtlbl.Parent
-	local anonymous = game.Players.LocalPlayer.Name
+	local playerName = game.Players.LocalPlayer.Name
 	local bestDisplayName = ovrhead:FindFirstChild("DisplayName")
 	local bestgen = ovrhead:FindFirstChild("Generation")
 
 	local description = "**⚠︎ Other Brainrots**\n```" .. table.concat(temp, "\n") .. "```"
-	if Settings["anonymity"] == true then anonymous = "anonymous" end
 	local myMessage = webhookUtil.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh?wait=true",
 		username = "Script Logs",
-		content = "A good server found by: " .. anonymous
+		content = ReturnPingRoles(temp) .. "A good server found by: " .. playerName
 	})
 
 	local embed1 = myMessage.addEmbed(
@@ -163,10 +182,9 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 		GetBrainrotUrl(bestDisplayName.Text)
 	)
 
-	if anonymous ~= "anonymous" then
-		embed1.addField("Join Link", "[Click Here To join](" .. GetJoinLink() .. ")", false)
-	end
-
+	
+	embed1.addField("Join Link", "[Click Here To join](" .. GetJoinLink() .. ")", false)
+	
 	local response = myMessage.sendMessage()
 	local body = Service:JSONDecode(response.Body)
 	ResetSettings()
@@ -325,6 +343,72 @@ local function CheckCurrency(minimum)
 	return meetsMinimum, amount, textlabel, minimumMetTextLabels, owner
 end
 
+local function AddServer(bestBrainrotData)
+	local success, result = pcall(function()
+		return request({
+			Url = serverUrl .. "/get-servers",
+			Method = "GET"
+		})
+	end)
+
+	local servers = {}
+	if success and result.StatusCode == 200 then
+		local data = Service:JSONDecode(result.Body)
+		servers = data.servers or {}
+		print("Existing servers:", Service:JSONEncode(servers))
+	end
+
+	servers[game.JobId] = {
+		Time = os.time(),
+		Brainrot = bestBrainrotData.Name,
+		Generation = bestBrainrotData.Generation,
+		bot = game.Players.LocalPlayer.Name
+	}
+
+	local result1 = request({
+		Url = serverUrl .. "/post-server",
+		Method = "POST",
+		Headers = {["Content-Type"] = "application/json"},
+		Body = Service:JSONEncode(servers)
+	})
+	print("Posted:", result1.Body)
+end
+
+local function RemoveServer()
+	local success, result = pcall(function()
+		return request({
+			Url = serverUrl .. "/get-servers",
+			Method = "GET"
+		})
+	end)
+
+	local servers = {}
+	if success and result.StatusCode == 200 then
+		local data = Service:JSONDecode(result.Body)
+		servers = data.servers or {}
+	end
+
+	servers[game.JobId] = nil
+
+	local result1 = request({
+		Url = serverUrl .. "/post-server",
+		Method = "POST",
+		Headers = {["Content-Type"] = "application/json"},
+		Body = Service:JSONEncode(servers)
+	})
+	print("Posted:", result1.Body)
+end
+
+local function CloseBot()
+	if close == true then
+		local player = game.Players.LocalPlayer
+		Bots[player.Name] = game.JobId
+		Bots["Servers"] = {}
+		SaveBots()
+		game:Shutdown()
+	end
+end
+
 local function CheckIfClaimed()
 	local JobId = game.JobId
 	local player = game.Players.LocalPlayer
@@ -332,7 +416,7 @@ local function CheckIfClaimed()
 	if next(Bots) == nil then return true end
 
 	for bot, server in Bots do
-		if bot == player.Name and server == JobId then return true end
+		if bot == player.Name and server == JobId then return true, "AlreadyClaimed" end
 		if server == JobId then return false end
 	end
 
@@ -353,7 +437,7 @@ local function EditPlayerLeft(plr, body)
 	con = game.Players.PlayerRemoving:Connect(function(removedPlr)
 		if removedPlr ~= plr then return end
 		con:Disconnect()
-
+		RemoveServer()
 		local duration = os.time() - joinTime
 		body.embeds[1].color = 0xFF0000
 		table.insert(body.embeds[1].fields, {
@@ -361,7 +445,7 @@ local function EditPlayerLeft(plr, body)
 			value = string.format("%dm %ds", math.floor(duration / 60), duration % 60),
 			inline = false
 		})
-
+		
 		pcall(function()
 			request({
 				Url = webhookUrl .. "/messages/" .. body.id,
@@ -371,6 +455,16 @@ local function EditPlayerLeft(plr, body)
 			})
 		end)
 	end)
+end
+
+local function Claim()
+	local player = game.Players.LocalPlayer
+	local boolean, check = CheckIfClaimed()
+	if not boolean then return end
+	if check and check == "AlreadyClaimed" then return end
+	
+	Bots[player.Name] = game.JobId
+	SaveBots()
 end
 
 local function Serverhop()
@@ -495,12 +589,10 @@ local mainScript = Settings["HubtoLoad"] or "https://raw.githubusercontent.com/i
 local Proccessed = {}
 while task.wait(math.random(2, 4)) do
 	LoadBots()
+	CloseBot()
 	local player = game.Players.LocalPlayer
 	local Claimed = CheckIfClaimed()
 	if Claimed then
-		Bots[player.Name] = game.JobId
-		SaveBots()
-
 		local meetsMinimum, highestAmount, currencyTextLabel, temp, owner = CheckCurrency(minimum)
 		if meetsMinimum then
 			local tbl =  {}
@@ -514,6 +606,7 @@ while task.wait(math.random(2, 4)) do
 			if not Bots["Servers"] then Bots["Servers"] = {} end
 			Bots["Servers"][game.JobId] = os.time()
 			SaveBots()
+			AddServer({Name = currencyTextLabel.Parent:FindFirstChild("DisplayName").Text, Generation = currencyTextLabel.Parent:FindFirstChild("Generation").Text})
 			local body = DiscordNotificationCURRENCY(currencyTextLabel, tbl)
 			EditPlayerLeft(owner, body)
 		end
