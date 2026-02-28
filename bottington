@@ -164,6 +164,7 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 
 	local ovrhead = txtlbl.Parent
 	local playerName = game.Players.LocalPlayer.Name
+	if not ovrhead then return end
 	local bestDisplayName = ovrhead:FindFirstChild("DisplayName")
 	local bestgen = ovrhead:FindFirstChild("Generation")
 
