@@ -155,7 +155,7 @@ local function ReturnPingRoles(tbl)
 		return ""
 	elseif total < 500 then
 		return "<@&1476593217599439012> "
-	elseif total > 1000 then
+	else
 		return "<@&1476593217599439012> <@&1476593349841391828> "
 	end
 end
