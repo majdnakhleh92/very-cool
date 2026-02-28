@@ -512,7 +512,7 @@ local function Serverhop()
 			writefile("Servers.JSON", game:HttpGet(API))
 			StartTeleport()
 		end
-		for i = 0, 99 do
+		for i = 1, 99 do
 			if #JSONData.data <= 1 then
 				EncodeToFile(NextCursor(JSONData.nextPageCursor))
 				TeleportService:Teleport(game.PlaceId, game.Players.LocalPlayer)
@@ -527,6 +527,7 @@ local function Serverhop()
 				if SaveTeleportAttempts then
 					appendfile("Attempts.txt", JobId .. "\n")
 				end
+				if JobId == game.JobId then continue end
 				TeleportService:TeleportToPlaceInstance(game.PlaceId, JobId, game.Players.LocalPlayer)
 				task.wait(IterationSpeed)
 			end
