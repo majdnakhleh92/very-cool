@@ -141,19 +141,8 @@ local function GetPlayerNameFromLabel(textLabel)
 	end
 end
 
-local function GetBrainrotUrl(name)
-	local brainrotImage = brainrotImages[name]
-	if brainrotImage then
-		return brainrotImage
-	end
-	return nil
-end
-
-local function Anonymousify()
-	local player = game.Players.LocalPlayer	
-	for _, plot in pairs(workspace.Plots:GetChildren()) do
-		if not plot then continue end
-
+local function GetPlotFromPlayer(plr)
+	for _, plot in workspace.Plots:GetChildren() do
 		local PlotSign = plot:FindFirstChild("PlotSign")
 		if not PlotSign then continue end
 		local SurfaceGui = PlotSign:FindFirstChild("SurfaceGui")
@@ -163,9 +152,35 @@ local function Anonymousify()
 		local textlabel = Frame:FindFirstChild("TextLabel")
 		if not textlabel then continue end
 
-		local playerFromSign = GetPlayerNameFromLabel(textlabel)
-		if player == playerFromSign then
-			textlabel.Text = "good luck finding me lmao"
+		if GetPlayerNameFromLabel(textlabel) == plr then
+			return plot
+		end
+	end
+end
+
+local function GetBrainrotUrl(name)
+	local brainrotImage = brainrotImages[name]
+	if brainrotImage then
+		return brainrotImage
+	end
+	return nil
+end
+
+local function Anonymousify()	
+	local plot = GetPlotFromPlayer(game.Players.LocalPlayer)
+	if plot then plot.PlotSign.SurfaceGui.Frame.TextLabel.Text = "good luck finding me lmao" end
+end
+
+local function CameFromDuels(plot)
+	local sign = plot:FindFirstChild("PlotSign")
+	if sign then
+		local textLabel = sign:FindFirstChild("SurfaceGui") and sign.SurfaceGui:FindFirstChild("Frame") and sign.SurfaceGui.Frame:FindFirstChild("TextLabel")
+		local ownerPlayer = GetPlayerNameFromLabel(textLabel)
+
+		if ownerPlayer and ownerPlayer:GetAttribute("__duels_block_steal") == true then
+			return true
+		else
+			return false
 		end
 	end
 end
@@ -176,6 +191,9 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 	local anonymous = game.Players.LocalPlayer.Name
 	local bestDisplayName = ovrhead:FindFirstChild("DisplayName")
 	local bestgen = ovrhead:FindFirstChild("Generation")
+	local owner = GetPlayerNameFromLabel(txtlbl)
+	local ownerPlot = GetPlotFromPlayer(owner)
+
 
 	local description = "**⚠︎ Other Brainrots**\n```" .. table.concat(temp, "\n") .. "```"
 	if Settings["anonymity"] == true then anonymous = "anonymous" end
@@ -195,8 +213,9 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 
 	if anonymous ~= "anonymous" then
 		embed1.addField("Server Id", game.JobId, false)
-		embed1.addField("Servers Hopped", Settings["Server Count"], false)
+		embed1.addField("Servers Hopped", Settings["Server Count"], true)
 	end
+	embed1.addField("Duels", tostring(CameFromDuels(ownerPlot)), true)
 
 	myMessage.sendMessage()
 	ResetSettings()
@@ -204,9 +223,10 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 end
 
 local function DiscordNotificationNAME(txtlbl: TextLabel)
+	local owner = GetPlayerNameFromLabel(txtlbl)
+	local ownerPlot = GetPlotFromPlayer(owner)
 
 	local anonymous = game.Players.LocalPlayer.Name
-
 	if Settings["anonymity"] == true then anonymous = "anonymous" end
 	local myMessage = webhookUtil.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
@@ -224,8 +244,9 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 
 	if anonymous ~= "anonymous" then
 		embed1.addField("Server Id", game.JobId, false)
-		embed1.addField("Servers Hopped", Settings["Server Count"], false)
+		embed1.addField("Servers Hopped", Settings["Server Count"], true)
 	end
+	embed1.addField("Duels", tostring(CameFromDuels(ownerPlot)), true)
 
 	myMessage.sendMessage()
 	ResetSettings()
@@ -233,6 +254,8 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 end
 
 local function DiscordNotificationMUTATION(Mutation, Brainrot)
+	local owner = GetPlayerNameFromLabel(Mutation)
+	local ownerPlot = GetPlotFromPlayer(owner)
 	local anonymous = game.Players.LocalPlayer.Name
 
 	if Settings["anonymity"] == true then anonymous = "anonymous" end
@@ -243,7 +266,7 @@ local function DiscordNotificationMUTATION(Mutation, Brainrot)
 	})
 
 	local embed1 = myMessage.addEmbed(
-		Brainrot .. " Mutated With: " .. Mutation,
+		Brainrot .. " Mutated With: " .. Mutation.Text,
 		Settings["embedColor"] or 0x57F287,
 		"brainrot found by mutation",
 		nil,
@@ -252,9 +275,9 @@ local function DiscordNotificationMUTATION(Mutation, Brainrot)
 
 	if anonymous ~= "anonymous" then
 		embed1.addField("Server Id", game.JobId, false)
-		embed1.addField("Servers Hopped", Settings["Server Count"], false)
+		embed1.addField("Servers Hopped", Settings["Server Count"], true)
 	end
-
+	embed1.addField("Duels", tostring(CameFromDuels(ownerPlot)), true)
 	myMessage.sendMessage()
 	ResetSettings()
 	return
@@ -273,6 +296,29 @@ local function GetAnimalOverhead()
 	end
 
 	return animalOverheadTable
+end
+
+local function HasOwner(part)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = {part}
+
+	local raycast = workspace:Raycast(part.Position, Vector3.new(0, -100, 0), params)
+	if raycast and raycast.Instance then
+
+		for _, Plot in workspace.Plots:GetChildren() do
+			if raycast.Instance:IsDescendantOf(Plot) then
+				if not Plot:FindFirstChild("PlotSign") then continue end
+				if not Plot.PlotSign:FindFirstChild("SurfaceGui") then continue end
+				if not Plot.PlotSign.SurfaceGui:FindFirstChild("Frame") then continue end
+				if not Plot.PlotSign.SurfaceGui.Frame:FindFirstChild("TextLabel") then continue end
+
+				return GetPlayerNameFromLabel(Plot.PlotSign.SurfaceGui.Frame.TextLabel), Plot
+			end
+		end
+	else 
+		return nil
+	end
 end
 
 local function GetMostValuable(strings, minimum)
@@ -335,7 +381,7 @@ end
 local function CheckMutations()
 	local mutation = Settings["MutationTarget"] or ""
 	local Brainrots = Settings["TargetBrainrots"] or {}
-	local MutatedBrainrotFound, Mutation, brainrot
+	local MutatedBrainrotFound, Mutationtxtlbl, brainrot
 
 	if mutation == "" and #Brainrots == 0 then return end
 
@@ -356,14 +402,14 @@ local function CheckMutations()
 
 		if mutationLabel.Text == mutation and table.find(Brainrots, DisplayName.Text) then
 			MutatedBrainrotFound = true
-			Mutation = mutationLabel.Text
+			Mutationtxtlbl = mutationLabel
 			brainrot = DisplayName.Text
 			print("working")
 			break
 		end
 	end
 
-	return MutatedBrainrotFound, Mutation, brainrot
+	return MutatedBrainrotFound, Mutationtxtlbl, brainrot
 end
 
 local function CheckNames() 
@@ -403,13 +449,15 @@ local function CheckCurrency(minimum)
 		local Stolen = overhead:FindFirstChild("Stolen")
 		local displayName = overhead:FindFirstChild("DisplayName")
 		local gen = overhead:FindFirstChild("Generation")
+		local owner = HasOwner(overhead.Parent)
 
-		if Stolen and (Stolen.Text == "FUSING" or Stolen.Text == "IN DUEL") and Stolen.Visible == true then 
+		if not owner then print("no owner buster") continue end
+		local illegalNames = {"IN DUEL", "FUSING", "READY!"}
+		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then 
 			continue 
 		end
 
 		if not gen then continue end
-
 		if displayName and table.find(blacklist, displayName.Text) then 
 			print("Blacklisted: " .. displayName.Text)
 			continue 
@@ -418,8 +466,8 @@ local function CheckCurrency(minimum)
 		table.insert(valuetable, gen)
 	end
 
-	local meetsMinimum, textlabel, amount, minimumMetTextLabels = GetMostValuable(valuetable, minimum)
-	return meetsMinimum, amount, textlabel, minimumMetTextLabels
+	local meetsMinimum, textlabel, amount, minimumMetTextLabels = GetMostValuable(valuetable, minimum)	
+	return meetsMinimum, amount, textlabel, minimumMetTextLabels, ownerPlot
 end
 
 local function Serverhop()
