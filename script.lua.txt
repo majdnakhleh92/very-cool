@@ -131,13 +131,26 @@ local HubToLoad = Serverhop:TextBox({
 		if url then
 			Settings["HubtoLoad"] = url
 		else
-			Notification("Invalid Loadstring!", "make sure the URL inside the loadstring is valid.")
+			Notification("Invalid Loadstring!", "Make sure the URL inside the loadstring is valid.")
 		end
 	end,
 
 	OnLeave = true,
 	ClearTextOnFocus = false,
-	PlaceHolderText = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/majdnakhleh92/very-cool/refs/heads/main/script.lua.txt"))()'
+	PlaceHolderText = 'loadstring(game:HttpGet("Example"))()'
+})
+
+local ExecuteDelay = Serverhop:Slider({
+	Name = "Delay between server hops",
+	Min = 0,
+	Max = 5,
+	Callback = function(value): number
+		Settings["ExecuteDelay"] = value
+	end,
+
+	DisabledText = "Hey you cant use this!",
+	DisplayAsPercent = false,
+	DecimalPlace = 1
 })
 
 Serverhop:Divider()
@@ -543,7 +556,7 @@ if Settings["MoneyPerSecond"] then
 end
 
 if Settings["ServerhopSpeed"] then
-	serverhopSpeed:SetValue(Settings["ServerhopSpeed"])
+	serverhopSpeed:SetValue(tonumber(Settings["ServerhopSpeed"]))
 end
 
 if Settings["anonymity"] ~= nil then
@@ -588,4 +601,8 @@ end
 
 if Settings["RegionPriority"] then
 	dropdown:SelectItems(Settings["RegionPriority"])
+end
+
+if Settings["ExecuteDelay"] then
+	ExecuteDelay:SetValue(tonumber(Settings["ExecuteDelay"]))
 end
