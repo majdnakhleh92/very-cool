@@ -141,6 +141,10 @@ local function GetPlayerNameFromLabel(textLabel)
 	end
 end
 
+local function GetJoinLink()
+	return string.format("https://www.roblox.com/games/start?placeId=%s&gameInstanceId=%s", game.PlaceId, game.JobId)
+end
+
 local function GetPlotFromPlayer(plr)
 	for _, plot in workspace.Plots:GetChildren() do
 		local PlotSign = plot:FindFirstChild("PlotSign")
@@ -205,6 +209,7 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 
 	if anonymous ~= "anonymous" then
 		embed1.addField("Server Id", game.JobId, false)
+		embed1.addField("Server Id (for mobile)", GetJoinLink(), false)
 		embed1.addField("Servers Hopped", Settings["Server Count"], true)
 	end
 	embed1.addField("Duels", tostring(CameFromDuels(owner)), true)
@@ -235,6 +240,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 
 	if anonymous ~= "anonymous" then
 		embed1.addField("Server Id", game.JobId, false)
+		embed1.addField("Server Id (for mobile)", GetJoinLink(), false)
 		embed1.addField("Servers Hopped", Settings["Server Count"], true)
 	end
 	embed1.addField("Duels", tostring(CameFromDuels(owner)), true)
@@ -265,6 +271,7 @@ local function DiscordNotificationMUTATION(Mutation, Brainrot)
 
 	if anonymous ~= "anonymous" then
 		embed1.addField("Server Id", game.JobId, false)
+		embed1.addField("Server Id (for mobile)", GetJoinLink(), false)
 		embed1.addField("Servers Hopped", Settings["Server Count"], true)
 	end
 	embed1.addField("Duels", tostring(CameFromDuels(owner)), true)
