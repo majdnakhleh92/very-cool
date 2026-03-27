@@ -590,6 +590,7 @@ local meetsMinimum, highestAmount, currencyTextLabel, temp = CheckCurrency(minim
 local mutatedBrainrotFound, mutation, brainrot = CheckMutations()
 
 local hasMatch = meetsMinimum or nameFound
+local executeDelay = Settings["ExecuteDelay"] or 0
 local mainScript = Settings["HubtoLoad"] or "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
 
 if meetsMinimum then
@@ -601,7 +602,10 @@ if meetsMinimum then
 	sound:Play()
 
 	Anonymousify()
-	task.spawn(function() task.wait(2) loadstring(game:HttpGet(mainScript))() end)
+	task.spawn(function()
+		task.wait(executeDelay)
+		loadstring(game:HttpGet(mainScript))()
+	end)
 	DiscordNotificationCURRENCY(currencyTextLabel, temp)
 
 elseif nameFound then
@@ -613,7 +617,10 @@ elseif nameFound then
 	sound:Play()
 
 	Anonymousify()
-	task.spawn(function() task.wait(2) loadstring(game:HttpGet(mainScript))() end)
+	task.spawn(function()
+		task.wait(executeDelay)
+		loadstring(game:HttpGet(mainScript))()
+	end)
 	DiscordNotificationNAME(matchedName)
 
 elseif mutatedBrainrotFound then
@@ -625,7 +632,10 @@ elseif mutatedBrainrotFound then
 	sound:Play()
 
 	Anonymousify()
-	task.spawn(function() task.wait(2) loadstring(game:HttpGet(mainScript))() end)
+	task.spawn(function()
+		task.wait(executeDelay)
+		loadstring(game:HttpGet(mainScript))()
+	end)
 	DiscordNotificationMUTATION(mutation, brainrot)
 else
 	Settings["Server Count"] += 1
