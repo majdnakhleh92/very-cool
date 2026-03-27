@@ -141,7 +141,7 @@ local HubToLoad = Serverhop:TextBox({
 })
 
 local ExecuteDelay = Serverhop:Slider({
-	Name = "Delay between server hops",
+	Name = "Delay before script execution",
 	Min = 0,
 	Max = 5,
 	Callback = function(value): number
