@@ -141,6 +141,29 @@ local function GetPlayerNameFromLabel(textLabel)
 	end
 end
 
+local function HasOwner(part)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = {part}
+
+	local raycast = workspace:Raycast(part.Position, Vector3.new(0, -100, 0), params)
+	if raycast and raycast.Instance then
+
+		for _, Plot in workspace.Plots:GetChildren() do
+			if raycast.Instance:IsDescendantOf(Plot) then
+				if not Plot:FindFirstChild("PlotSign") then continue end
+				if not Plot.PlotSign:FindFirstChild("SurfaceGui") then continue end
+				if not Plot.PlotSign.SurfaceGui:FindFirstChild("Frame") then continue end
+				if not Plot.PlotSign.SurfaceGui.Frame:FindFirstChild("TextLabel") then continue end
+
+				return GetPlayerNameFromLabel(Plot.PlotSign.SurfaceGui.Frame.TextLabel), Plot
+			end
+		end
+	else 
+		return nil
+	end
+end
+
 local function GetJoinLink()
 	return string.format("https://www.roblox.com/games/start?placeId=%s&gameInstanceId=%s", game.PlaceId, game.JobId)
 end
@@ -189,7 +212,7 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 	local anonymous = game.Players.LocalPlayer.Name
 	local bestDisplayName = ovrhead:FindFirstChild("DisplayName")
 	local bestgen = ovrhead:FindFirstChild("Generation")
-	local owner = GetPlayerNameFromLabel(txtlbl)
+	local owner = HasOwner(ovrhead.Parent)
 
 	local description = "**⚠︎ Other Brainrots**\n```" .. table.concat(temp, "\n") .. "```"
 	if Settings["anonymity"] == true then anonymous = "anonymous" end
@@ -220,7 +243,7 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 end
 
 local function DiscordNotificationNAME(txtlbl: TextLabel)
-	local owner = GetPlayerNameFromLabel(txtlbl)
+	local owner = HasOwner(txtlbl.Parent.Parent)
 
 	local anonymous = game.Players.LocalPlayer.Name
 	if Settings["anonymity"] == true then anonymous = "anonymous" end
@@ -251,7 +274,7 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 end
 
 local function DiscordNotificationMUTATION(Mutation, Brainrot)
-	local owner = GetPlayerNameFromLabel(Mutation)
+	local owner = HasOwner(Mutation.Parent.Parent)
 	local anonymous = game.Players.LocalPlayer.Name
 
 	if Settings["anonymity"] == true then anonymous = "anonymous" end
@@ -293,29 +316,6 @@ local function GetAnimalOverhead()
 	end
 
 	return animalOverheadTable
-end
-
-local function HasOwner(part)
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = {part}
-
-	local raycast = workspace:Raycast(part.Position, Vector3.new(0, -100, 0), params)
-	if raycast and raycast.Instance then
-
-		for _, Plot in workspace.Plots:GetChildren() do
-			if raycast.Instance:IsDescendantOf(Plot) then
-				if not Plot:FindFirstChild("PlotSign") then continue end
-				if not Plot.PlotSign:FindFirstChild("SurfaceGui") then continue end
-				if not Plot.PlotSign.SurfaceGui:FindFirstChild("Frame") then continue end
-				if not Plot.PlotSign.SurfaceGui.Frame:FindFirstChild("TextLabel") then continue end
-
-				return GetPlayerNameFromLabel(Plot.PlotSign.SurfaceGui.Frame.TextLabel), Plot
-			end
-		end
-	else 
-		return nil
-	end
 end
 
 local function GetMostValuable(strings, minimum)
