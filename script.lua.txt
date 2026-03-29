@@ -126,13 +126,8 @@ Serverhop:Divider()
 local HubToLoad = Serverhop:TextBox({
 	Name = "Hub to Load",
 	Callback = function(value): string
-		local url = value:match('https?://[^%s"\'%)]+')
-
-		if url then
-			Settings["HubtoLoad"] = url
-		else
-			Notification("Invalid Loadstring!", "Make sure the URL inside the loadstring is valid.")
-		end
+		Settings["HubtoLoad"] = value
+		Notification("Success!", "Main script set to " .. value)
 	end,
 
 	OnLeave = true,
@@ -548,7 +543,7 @@ local APITextbox = advancedSettings:TextBox({
 
 -- // LOADING CONFIGURATIONS // --
 if Settings["HubtoLoad"] then
-	HubToLoad:SetInput("loadstring(game:HttpGet(" .. Settings["HubtoLoad"] .. ")()")
+	HubToLoad:SetInput(tostring(Settings["HubtoLoad"]))
 end
 
 if Settings["MoneyPerSecond"] then
