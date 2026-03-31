@@ -388,14 +388,17 @@ local function CheckMutations()
 		local mutationLabel = overhead:FindFirstChild("Mutation")
 		local Stolen = overhead:FindFirstChild("Stolen")
 		local DisplayName = overhead:FindFirstChild("DisplayName")
-
+		local owner = HasOwner(overhead.Parent)
+		
+		if not owner then print("no owner buster") continue end
 		if not DisplayName then continue end
-		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
-		if mutationLabel and mutationLabel.Visible == false then continue end
+		if not owner then print("no owner buster") continue end
+		local illegalNames = {"IN DUEL", "FUSING", "READY!"}
+		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then continue end
 
-		if mutationLabel.Text == "Diamond" and DisplayName.Text == "Trippi Troppi" then
-			print("its freaky")
-		end
+		local skipDuels = Settings["SkipDuels"] or true
+		if skipDuels and CameFromDuels(owner) then continue end
+		if mutationLabel and mutationLabel.Visible == false then continue end
 
 		if mutationLabel.Text == mutation and table.find(Brainrots, DisplayName.Text) then
 			MutatedBrainrotFound = true
@@ -417,8 +420,14 @@ local function CheckNames()
 	for _, overhead in pairs(AnimalOverheadTabel) do
 		local DisplayName = overhead:FindFirstChild("DisplayName")
 		local Stolen = overhead:FindFirstChild("Stolen")
+		local owner = HasOwner(overhead.Parent)
+		
+		if not owner then print("no owner buster") continue end
+		local illegalNames = {"IN DUEL", "FUSING", "READY!"}
+		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then continue end
 
-		if Stolen and Stolen.Text == "FUSING" and Stolen.Visible == true then continue end
+		local skipDuels = Settings["SkipDuels"] or true
+		if skipDuels and CameFromDuels(owner) then continue end
 		if not DisplayName then continue end
 
 		if table.find(Priority, DisplayName.Text) then
@@ -450,9 +459,10 @@ local function CheckCurrency(minimum)
 
 		if not owner then print("no owner buster") continue end
 		local illegalNames = {"IN DUEL", "FUSING", "READY!"}
-		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then 
-			continue 
-		end
+		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then continue end
+
+		local skipDuels = Settings["SkipDuels"] or true
+		if skipDuels and CameFromDuels(owner) then continue end
 
 		if not gen then continue end
 		if displayName and table.find(blacklist, displayName.Text) then 
@@ -464,7 +474,7 @@ local function CheckCurrency(minimum)
 	end
 
 	local meetsMinimum, textlabel, amount, minimumMetTextLabels = GetMostValuable(valuetable, minimum)	
-	return meetsMinimum, amount, textlabel, minimumMetTextLabels, ownerPlot
+	return meetsMinimum, amount, textlabel, minimumMetTextLabels
 end
 
 local function Serverhop()
