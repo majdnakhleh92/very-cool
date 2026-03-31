@@ -67,7 +67,7 @@ end
 
 local function toboolan(str)
 	local String = tostring(str):lower()
-	
+
 	if String == "true" then
 		return true
 	else
@@ -321,6 +321,12 @@ local blacklistTextbox = configurations:TextBox({
 local removeBlacklistTextbox = configurations:TextBox({
 	Name = "Remove Blacklisted Brainrots",
 	Callback = function(value): string
+		if value == "all" then
+			Settings["Blacklist"] = {}
+			updateParagraph(blacklisted, Settings["Blacklist"])
+			return
+		end
+		
 		local trimmed = value:match("^%s*(.-)%s*$")
 		if trimmed == "" then return end
 
@@ -377,6 +383,12 @@ local whitelistTextbox = configurations:TextBox({
 local removeWhitelistTextbox = configurations:TextBox({
 	Name = "Remove Whitelisted Brainrots",
 	Callback = function(value): string
+		if value == "all" then
+			Settings["Whitelist"] = {}
+			updateParagraph(whitelisted, Settings["Whitelist"])
+			return
+		end
+		
 		local trimmed = value:match("^%s*(.-)%s*$")
 		if trimmed == "" then Notification() return end
 
@@ -424,9 +436,10 @@ local targetedBrainrots = configurations:Paragraph({
 local targetBrainrotTextbox = configurations:TextBox({
 	Name = "Target Brainrots",
 	Callback = function(value): string
+		
 		local trimmed = value:match("^%s*(.-)%s*$")
 		if trimmed == "" then return end
-
+		
 		for entry in trimmed:gmatch("[^,]+") do
 			local cleaned = entry:match("^%s*(.-)%s*$")
 			if cleaned ~= "" and not table.find(Settings["TargetBrainrots"], cleaned) then
@@ -446,6 +459,12 @@ local targetBrainrotTextbox = configurations:TextBox({
 local DetargetTextbox = configurations:TextBox({
 	Name = "Detarget Brainrots",
 	Callback = function(value): string
+		if value == "all" then
+			Settings["TargetBrainrots"] = {}
+			updateParagraph(targetedBrainrots, Settings["TargetBrainrots"])
+			return
+		end
+		
 		local trimmed = value:match("^%s*(.-)%s*$")
 		if trimmed == "" then Notification() return end
 
