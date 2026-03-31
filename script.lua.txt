@@ -65,6 +65,16 @@ local function Notification(Title, Body)
 	})
 end
 
+local function toboolan(str)
+	local String = tostring(str):lower()
+	
+	if String == "true" then
+		return true
+	else
+		return false
+	end
+end
+
 local function ParseNumber(str)
 	str = tostring(str):gsub("%s+", ""):lower()
 
@@ -260,6 +270,19 @@ local serverhopSpeed = configurations:Slider({
 	FLAG = "slider",
 	DisplayAsPercent = false,
 	DecimalPlace = 2
+})
+
+configurations:Divider()
+
+local SkipDuels = configurations:Toggle({
+	Name = "Skip Duels",
+	Callback = function(value): boolean
+		Settings["SkipDuels"] = tostring(value)
+	end,
+
+	DisabledText = "Hey you cant use this!",
+	FLAG = "toggle_SkipDuels",
+	Default = true,
 })
 
 configurations:Divider()
@@ -547,31 +570,31 @@ if Settings["HubtoLoad"] then
 end
 
 if Settings["MoneyPerSecond"] then
-	moneyPerSecond:SetInput(Settings["MoneyPerSecond"])
+	moneyPerSecond:SetInput(tostring(Settings["MoneyPerSecond"]))
 end
 
 if Settings["ServerhopSpeed"] then
 	serverhopSpeed:SetValue(tonumber(Settings["ServerhopSpeed"]))
 end
 
-if Settings["anonymity"] ~= nil then
-	anonymity:SetValue(Settings["anonymity"])
+if Settings["anonymity"] then
+	anonymity:SetValue(toboolan(Settings["anonymity"]))
 end
 
 if Settings["embedColor"] then
 	embedColorPicker:SetColor(HexToColor3(Settings["embedColor"]))
 end
 
-if Settings["RemoveErrorPrompts"] ~= nil then
-	RemoveErrorPrompts:SetValue(Settings["RemoveErrorPrompts"])
+if Settings["RemoveErrorPrompts"] then
+	RemoveErrorPrompts:SetValue(toboolan(Settings["RemoveErrorPrompts"]))
 end
 
-if Settings["ExcludefullServers"] ~= nil then
-	ExcludefullServers:SetValue(Settings["ExcludefullServers"])
+if Settings["ExcludefullServers"] then
+	ExcludefullServers:SetValue(toboolan(Settings["ExcludefullServers"]))
 end
 
-if Settings["SaveTeleportAttempts"] ~= nil then
-	SaveTeleportAttempts:SetValue(Settings["SaveTeleportAttempts"])
+if Settings["SaveTeleportAttempts"] then
+	SaveTeleportAttempts:SetValue(toboolan(Settings["SaveTeleportAttempts"]))
 end
 
 if Settings["API"] then
@@ -600,4 +623,8 @@ end
 
 if Settings["ExecuteDelay"] then
 	ExecuteDelay:SetValue(tonumber(Settings["ExecuteDelay"]))
+end
+
+if Settings["SkipDuels"] then
+	SkipDuels:SetValue(toboolan(Settings["SkipDuels"]))
 end
