@@ -159,6 +159,22 @@ local function HasOwner(part)
 				return GetPlayerNameFromLabel(Plot.PlotSign.SurfaceGui.Frame.TextLabel), Plot
 			end
 		end
+		if not raycast.Instance:IsDescendantOf(workspace.Plots) then
+			for _, model in workspace.RenderedMovingAnimals:GetChildren() do
+				local overhead, closest = nil, math.huge
+
+				for _, v in workspace.Debris:GetChildren() do
+					if not v:FindFirstChild("AnimalOverhead") then continue end
+
+					local distance = (v.Position - part.Position).Magnitude
+					if distance < closest then
+						overhead = v.AnimalOverhead
+						closest = distance
+					end
+				end
+				if overhead then return "Carpet" end
+			end
+		end
 	else 
 		return nil
 	end
@@ -199,7 +215,7 @@ local function Anonymousify()
 end
 
 local function CameFromDuels(owner)
-	if owner and owner:GetAttribute("__duels_block_steal") == true then
+	if owner and owner~="Carpet" and owner:GetAttribute("__duels_block_steal") == true then
 		return true
 	else
 		return false
@@ -235,7 +251,11 @@ local function DiscordNotificationCURRENCY(txtlbl, temp)
 		embed1.addField("Server Join Link (for mobile)", "[Click Here To Join](".. GetJoinLink() .. ")", false)
 		embed1.addField("Servers Hopped", Settings["Server Count"], true)
 	end
-	embed1.addField("Duels", tostring(CameFromDuels(owner)), true)
+	if owner == "Carpet" then
+		embed1.addField("Carpet", "true", true)
+	else
+		embed1.addField("Duels", tostring(CameFromDuels(owner)), true)
+	end
 
 	myMessage.sendMessage()
 	ResetSettings()
@@ -266,7 +286,11 @@ local function DiscordNotificationNAME(txtlbl: TextLabel)
 		embed1.addField("Server Join Link (for mobile)", "[Click Here To Join](".. GetJoinLink() .. ")", false)
 		embed1.addField("Servers Hopped", Settings["Server Count"], true)
 	end
-	embed1.addField("Duels", tostring(CameFromDuels(owner)), true)
+	if owner == "Carpet" then
+		embed1.addField("Carpet", "true", true)
+	else
+		embed1.addField("Duels", tostring(CameFromDuels(owner)), true)
+	end
 
 	myMessage.sendMessage()
 	ResetSettings()
@@ -297,7 +321,11 @@ local function DiscordNotificationMUTATION(Mutation, Brainrot)
 		embed1.addField("Server Join Link (for mobile)", "[Click Here To Join](".. GetJoinLink() .. ")", false)
 		embed1.addField("Servers Hopped", Settings["Server Count"], true)
 	end
-	embed1.addField("Duels", tostring(CameFromDuels(owner)), true)
+	if owner == "Carpet" then
+		embed1.addField("Carpet", "true", true)
+	else
+		embed1.addField("Duels", tostring(CameFromDuels(owner)), true)
+	end
 	myMessage.sendMessage()
 	ResetSettings()
 	return
@@ -389,7 +417,7 @@ local function CheckMutations()
 		local Stolen = overhead:FindFirstChild("Stolen")
 		local DisplayName = overhead:FindFirstChild("DisplayName")
 		local owner = HasOwner(overhead.Parent)
-		
+
 		if not owner then print("no owner buster") continue end
 		if not DisplayName then continue end
 		if not owner then print("no owner buster") continue end
@@ -421,7 +449,7 @@ local function CheckNames()
 		local DisplayName = overhead:FindFirstChild("DisplayName")
 		local Stolen = overhead:FindFirstChild("Stolen")
 		local owner = HasOwner(overhead.Parent)
-		
+
 		if not owner then print("no owner buster") continue end
 		local illegalNames = {"IN DUEL", "FUSING", "READY!"}
 		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then continue end
