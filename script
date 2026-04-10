@@ -575,21 +575,6 @@ local function Serverhop()
 		StartTeleport()
 	end
 
-	if RemoveErrorPrompts then 
-		local RG = CoreGui:FindFirstChild("RobloxGui")
-		local M = RG and RG:FindFirstChild("Modules")
-		local EP = M and M:FindFirstChild("ErrorPrompt")
-
-		if EP then
-			EP:Destroy()
-		end
-
-		local RPG = CoreGui:FindFirstChild("RobloxPromptGui")
-		if RPG then
-			RPG:Destroy()
-		end
-	end
-
 	if isfile("Servers.JSON") then
 		local success, JSONData = pcall(function()
 			return HttpService:JSONDecode(readfile("Servers.JSON"))
