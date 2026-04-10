@@ -622,6 +622,13 @@ local function Serverhop()
 	end
 end
 
+task.spawn(function()
+	local GuiService = cloneref and cloneref(game:GetService("GuiService")) or game:GetService("GuiService")
+	while task.wait(0.005) do
+		pcall(function() GuiService:ClearError() end)
+	end
+end)
+
 local minimum = tonumber(Settings["MoneyPerSecond"]) or 10_000_000
 local nameFound, matchedName = CheckNames()
 local meetsMinimum, highestAmount, currencyTextLabel, temp = CheckCurrency(minimum)
