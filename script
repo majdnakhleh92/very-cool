@@ -460,11 +460,6 @@ local function CheckNames()
 
 		if table.find(Priority, DisplayName.Text) then
 			table.insert(nameMatches, DisplayName)
-
-		elseif DisplayName.Text == "Lucky Block" then
-			if overhead:FindFirstChild("Rarity") and overhead.Rarity.Text == "Secret" then 
-				table.insert(nameMatches, DisplayName)
-			end
 		end
 	end
 
