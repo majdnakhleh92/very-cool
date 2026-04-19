@@ -421,7 +421,7 @@ local function CheckMutations()
 		if not owner then print("no owner buster") continue end
 		if not DisplayName then continue end
 		if not owner then print("no owner buster") continue end
-		local illegalNames = {"IN DUEL", "FUSING", "READY!"}
+		local illegalNames = {"IN DUEL", "FUSING", "READY!", "CRAFTING"}
 		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then continue end
 
 		local skipDuels = Settings["SkipDuels"] or true
@@ -451,7 +451,7 @@ local function CheckNames()
 		local owner = HasOwner(overhead.Parent)
 
 		if not owner then print("no owner buster") continue end
-		local illegalNames = {"IN DUEL", "FUSING", "READY!"}
+		local illegalNames = {"IN DUEL", "FUSING", "READY!", "CRAFTING"}
 		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then continue end
 
 		local skipDuels = Settings["SkipDuels"] or true
@@ -481,7 +481,7 @@ local function CheckCurrency(minimum)
 		local owner = HasOwner(overhead.Parent)
 
 		if not owner then print("no owner buster") continue end
-		local illegalNames = {"IN DUEL", "FUSING", "READY!"}
+		local illegalNames = {"IN DUEL", "FUSING", "READY!", "CRAFTING"}
 		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then continue end
 
 		local skipDuels = Settings["SkipDuels"] or true
