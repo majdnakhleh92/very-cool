@@ -99,7 +99,7 @@ local function ParseNumber(str)
 
 	return value
 end
-
+warn("START")
 local function updateParagraph(paragraph, list)
 	paragraph:SetBody(table.concat(list, ", "))
 end
@@ -188,7 +188,6 @@ local moneyPerSecond = configurations:TextBox({
 		end
 	end,
 
-	FLAG = "$/stextbox",
 	OnlyNumbers = false,
 	OnLeave = true,
 	ClearTextOnFocus = false,
@@ -287,204 +286,185 @@ local SkipDuels = configurations:Toggle({
 
 configurations:Divider()
 
-local label1 = configurations:Label("You can multi add brainrots by adding a comma [ , ] after each one!") 
+local Brainrots = {}
+local Traits = {}
 
-Settings["Blacklist"] = Settings["Blacklist"] or {}
+for _, v in game.ReplicatedStorage.Models.Animals:GetChildren() do
+	table.insert(Brainrots, v.Name)
+end
+for _, v in game.ReplicatedStorage.Models.Traits:GetChildren() do
+	table.insert(Traits, v.Name)
+end
+for _, v in game.ReplicatedStorage.Models.TraitsPerAnimal:GetChildren() do
+	table.insert(Traits, v.Name)
+end
 
-local blacklisted = configurations:Paragraph({
-	Title = "Current Blacklisted Brainrots",
-	Body = table.concat(Settings["Blacklist"], ", "),
-})
 
-local blacklistTextbox = configurations:TextBox({
+local dropdown = configurations:Dropdown({
 	Name = "Blacklist Brainrots",
-	Callback = function(value): string
-		local trimmed = value:match("^%s*(.-)%s*$")
-		if trimmed == "" then return end
-
-		for entry in trimmed:gmatch("[^,]+") do
-			local cleaned = entry:match("^%s*(.-)%s*$")
-			if cleaned ~= "" and not table.find(Settings["Blacklist"], cleaned) then
-				table.insert(Settings["Blacklist"], cleaned)
-				Notification("blacklisted!", "[ " .. cleaned .. " ]")
-			elseif table.find(Settings["Blacklist"], cleaned) then
-				Notification("Already blacklisted!", "")
-			end
-		end
-
-		updateParagraph(blacklisted, Settings["Blacklist"])
+	Items = Brainrots,
+	Callback = function(value)
+		Settings["Blacklist"] = value
 	end,
-	OnLeave = true,
-	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
-})
 
-local removeBlacklistTextbox = configurations:TextBox({
-	Name = "Remove Blacklisted Brainrots",
-	Callback = function(value): string
-		if value == "all" then
-			Settings["Blacklist"] = {}
-			updateParagraph(blacklisted, Settings["Blacklist"])
-			return
-		end
-		
-		local trimmed = value:match("^%s*(.-)%s*$")
-		if trimmed == "" then return end
-
-		for entry in trimmed:gmatch("[^,]+") do
-			local cleaned = entry:match("^%s*(.-)%s*$")
-			if cleaned ~= "" then
-				local index = table.find(Settings["Blacklist"], cleaned)
-				if index then
-					table.remove(Settings["Blacklist"], index)
-					Notification("Removed from blacklisted!", "[ " .. cleaned .. " ]")
-				else
-					Notification("Not in blacklisted!", "[ " .. cleaned .. " ]")
-				end
-			end
-		end
-
-		updateParagraph(blacklisted, Settings["Blacklist"])
-	end,
-	OnLeave = true,
-	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
+	DisabledText = "Hey you cant use this!",
+	Alphabetical = true,
+	Multiselect = true,
+	Default = Settings["Blacklist"] or {},
+	Regex = function(itemToClean)
+		local cleanedItem = itemToClean
+		return cleanedItem or itemToClean
+	end
 })
 
 configurations:Divider()
 
 Settings["Whitelist"] = Settings["Whitelist"] or {}
 
-local whitelisted = configurations:Paragraph({
-	Title = "Current Whitelisted Brainrots",
-	Body = table.concat(Settings["Whitelist"], " "),
-})
-
-local whitelistTextbox = configurations:TextBox({
+local dropdown = configurations:Dropdown({
 	Name = "Whitelist Brainrots",
-	Callback = function(value): string
-		local trimmed = value:match("^%s*(.-)%s*$")
-		if trimmed == "" then return end
-
-		for entry in trimmed:gmatch("[^,]+") do
-			local cleaned = entry:match("^%s*(.-)%s*$")
-			if cleaned ~= "" and not table.find(Settings["Whitelist"], cleaned) then
-				table.insert(Settings["Whitelist"], cleaned)
-				Notification("whitelisted!", "[ " .. cleaned .. " ]")
-			elseif table.find(Settings["Whitelist"], cleaned) then
-				Notification("Already whitelisted!", "")
-			end
-		end
-
-		updateParagraph(whitelisted, Settings["Whitelist"])
+	Items = Brainrots,
+	Callback = function(value)
+		Settings["Whitelist"] = value
 	end,
-	OnLeave = true,
-	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
-})
 
-local removeWhitelistTextbox = configurations:TextBox({
-	Name = "Remove Whitelisted Brainrots",
-	Callback = function(value): string
-		if value == "all" then
-			Settings["Whitelist"] = {}
-			updateParagraph(whitelisted, Settings["Whitelist"])
-			return
-		end
-		
-		local trimmed = value:match("^%s*(.-)%s*$")
-		if trimmed == "" then Notification() return end
-
-		for entry in trimmed:gmatch("[^,]+") do
-			local cleaned = entry:match("^%s*(.-)%s*$")
-			if cleaned ~= "" then
-				local index = table.find(Settings["Whitelist"], cleaned)
-				if index then
-					table.remove(Settings["Whitelist"], index)
-					Notification("Removed from whitelist!", "[ " .. cleaned .. " ]")
-				else
-					Notification("Not in whitelist!", "[ " .. cleaned .. " ]")
-				end
-			end
-		end
-
-		updateParagraph(whitelisted, Settings["Whitelist"])
-	end,
-	OnLeave = true,
-	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
+	DisabledText = "Hey you cant use this!",
+	Alphabetical = true,
+	Multiselect = true,
+	Default = Settings["Whitelist"] or {},
+	Regex = function(itemToClean)
+		local cleanedItem = itemToClean
+		return cleanedItem or itemToClean
+	end
 })
 
 configurations:Divider()
-local label17 = configurations:Label("Find brainrots by their mutation! Useful if you are filling up an index") 
+local label17 = configurations:Label("Find brainrots by specifications (e.g mutations, traits, minimum value)") 
 
-local mutationTarget = configurations:TextBox({
-	Name = "Target Mutation",
-	Callback = function(value): string
-		Settings["MutationTarget"] = value
-		Notification("Success!", "Target Mutation set to " .. value)
+if not Settings["SpecificatedPets"]  then
+	Settings["SpecificatedPets"] = {}
+end
+
+local findEnabled
+local traitWhitelist
+local mutWhitelist
+local minGenValue
+
+local SpecificatedPet = ""
+local dropdown = configurations:Dropdown({
+	Name = "Select Brainrot",
+	Items = Brainrots,
+	Callback = function(value)
+		if not Settings["SpecificatedPets"][value] then Settings["SpecificatedPets"][value] = {} end
+		SpecificatedPet = value
+
+		findEnabled:SetValue(Settings["SpecificatedPets"][SpecificatedPet].Enabled == true)
+
+		if Settings["SpecificatedPets"][SpecificatedPet].MinGen ~= nil then
+			minGenValue:SetInput(tostring(Settings["SpecificatedPets"][SpecificatedPet].MinGen))
+		else
+			minGenValue:SetInput("0")
+		end
+		if Settings["SpecificatedPets"][SpecificatedPet].TraitWhitelist ~= nil then
+			traitWhitelist:SelectItems(Settings["SpecificatedPets"][SpecificatedPet].TraitWhitelist)
+		else
+			traitWhitelist:SelectItems({})
+		end
+		if Settings["SpecificatedPets"][SpecificatedPet].MutWhitelist ~= nil then
+			mutWhitelist:SelectItems(Settings["SpecificatedPets"][SpecificatedPet].MutWhitelist)
+		else
+			mutWhitelist:SelectItems({})
+		end
 	end,
 
-	OnlyNumbers = false,
+	DisabledText = "Hey you cant use this!",
+	Alphabetical = true,
+	Multiselect = false,
+	Default = "",
+	Regex = function(itemToClean)
+		local cleanedItem = itemToClean
+		return cleanedItem or itemToClean
+	end
+})
+
+findEnabled = configurations:Toggle({
+	Name = "Enable Specificated Finding",
+	Callback = function(value): boolean
+		if SpecificatedPet == "" or not Settings["SpecificatedPets"][SpecificatedPet] then Notification("No Selected Brainrot Found!", "Please select a brainrot") return end
+		if Settings["SpecificatedPets"][SpecificatedPet].Enable==nil then
+			Settings["SpecificatedPets"][SpecificatedPet].Enabled = false
+		end
+
+		Settings["SpecificatedPets"][SpecificatedPet].Enabled = value
+	end,
+
+	DisabledText = "Hey you cant use this!",
+	Default = false,
+})
+
+traitWhitelist = configurations:Dropdown({
+	Name = "Trait Whitelist",
+	Items = Traits,
+	Callback = function(value)
+		if SpecificatedPet == "" or not Settings["SpecificatedPets"][SpecificatedPet] then Notification("No Selected Brainrot Found!", "Please select a brainrot") return end
+		if not Settings["SpecificatedPets"][SpecificatedPet].TraitWhitelist then
+			Settings["SpecificatedPets"][SpecificatedPet].TraitWhitelist = {}
+		end
+		Settings["SpecificatedPets"][SpecificatedPet].TraitWhitelist = value
+	end,
+
+	DisabledText = "Hey you cant use this!",
+	Alphabetical = true,
+	Multiselect = true,
+	Default = {},
+	Regex = function(itemToClean)
+		local cleanedItem = itemToClean
+		return cleanedItem or itemToClean
+	end
+})
+
+mutWhitelist = configurations:Dropdown({
+	Name = "Mutation Whitelist",
+	Items = {"Gold", "Diamond", "Rainbow", "Bloodrot", "Candy", "Lava", "Galaxy", "YinYang", "Radioactive", "Cursed", "Divine", "Cyber"},
+	Callback = function(value)
+		if SpecificatedPet == "" or not Settings["SpecificatedPets"][SpecificatedPet] then Notification("No Selected Brainrot Found!", "Please select a brainrot") return end
+		if not Settings["SpecificatedPets"][SpecificatedPet].MutWhitelist then
+			Settings["SpecificatedPets"][SpecificatedPet].MutWhitelist = {}
+		end
+		Settings["SpecificatedPets"][SpecificatedPet].MutWhitelist = value
+	end,
+
+	DisabledText = "Hey you cant use this!",
+	Alphabetical = false,
+	Multiselect = true,
+	Default = {},
+	Regex = function(itemToClean)
+		local cleanedItem = itemToClean
+		return cleanedItem or itemToClean
+	end
+})
+
+minGenValue = configurations:TextBox({
+	Name = "Minimum Generation Value",
+	Callback = function(value): string
+		value = value:gsub("_", "")
+		local filtered = ParseNumber(value)
+		if filtered then
+			if SpecificatedPet == "" or not Settings["SpecificatedPets"][SpecificatedPet] then Notification("No Selected Brainrot Found!", "Please select a brainrot") return end
+
+			Settings["SpecificatedPets"][SpecificatedPet].MinGen = filtered
+			Notification("Success!", "Minimum Money Per Second set to " .. filtered)
+		else
+			Notification("Invalid Number!", "make sure the number is valid")
+		end
+
+	end,
+
+	DisabledText = "Hey you cant use this!",
+	Default = "0",
 	OnLeave = true,
 	ClearTextOnFocus = false,
-	PlaceHolderText = "Cursed, Radioactive, etc"
-})
-
-Settings["TargetBrainrots"] = Settings["TargetBrainrots"] or {}
-local targetedBrainrots = configurations:Paragraph({
-	Title = "Current Targeted Brainrots",
-	Body = table.concat(Settings["TargetBrainrots"], " "),
-})
-
-local targetBrainrotTextbox = configurations:TextBox({
-	Name = "Target Brainrots",
-	Callback = function(value): string
-		
-		local trimmed = value:match("^%s*(.-)%s*$")
-		if trimmed == "" then return end
-		
-		for entry in trimmed:gmatch("[^,]+") do
-			local cleaned = entry:match("^%s*(.-)%s*$")
-			if cleaned ~= "" and not table.find(Settings["TargetBrainrots"], cleaned) then
-				table.insert(Settings["TargetBrainrots"], cleaned)
-				Notification("Brainrot included!", "[ " .. cleaned .. " ]")
-			elseif table.find(Settings["TargetBrainrots"], cleaned) then
-				Notification("Already included!", "")
-			end
-		end
-
-		updateParagraph(targetedBrainrots, Settings["TargetBrainrots"])
-	end,
-	OnLeave = true,
-	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
-})
-
-local DetargetTextbox = configurations:TextBox({
-	Name = "Detarget Brainrots",
-	Callback = function(value): string
-		if value == "all" then
-			Settings["TargetBrainrots"] = {}
-			updateParagraph(targetedBrainrots, Settings["TargetBrainrots"])
-			return
-		end
-		
-		local trimmed = value:match("^%s*(.-)%s*$")
-		if trimmed == "" then Notification() return end
-
-		for entry in trimmed:gmatch("[^,]+") do
-			local cleaned = entry:match("^%s*(.-)%s*$")
-			if cleaned ~= "" then
-				local index = table.find(Settings["TargetBrainrots"], cleaned)
-				if index then
-					table.remove(Settings["TargetBrainrots"], index)
-					Notification("Removed from tagreted brainrots!", "[ " .. cleaned .. " ]")
-				else
-					Notification("Not in tagreted brainrots!", "[ " .. cleaned .. " ]")
-				end
-			end
-		end
-
-		updateParagraph(targetedBrainrots, Settings["TargetBrainrots"])
-	end,
-	OnLeave = true,
-	PlaceHolderText = "Brainrot1 or brainrot1, brainrot 2, etc"
+	PlaceHolderText = ""
 })
 
 local discordConfiguration = window:Tab({
@@ -493,18 +473,6 @@ local discordConfiguration = window:Tab({
 	Image = ""
 })
 
-local label1 = discordConfiguration:Label("Enabling this will remove your username, serverhop count, and serverid from the discord notification") 
-
-local anonymity = discordConfiguration:Toggle({
-	Name = "anonymity",
-	Callback = function(value): boolean
-		Settings["anonymity"] = value
-	end,
-
-	DisabledText = "Hey you cant use this!",
-	FLAG = "toggle_anonymity",
-	Default = false,
-})
 
 discordConfiguration:Divider()
 
@@ -596,10 +564,6 @@ if Settings["ServerhopSpeed"] then
 	serverhopSpeed:SetValue(tonumber(Settings["ServerhopSpeed"]))
 end
 
-if Settings["anonymity"] then
-	anonymity:SetValue(toboolan(Settings["anonymity"]))
-end
-
 if Settings["embedColor"] then
 	embedColorPicker:SetColor(HexToColor3(Settings["embedColor"]))
 end
@@ -618,22 +582,6 @@ end
 
 if Settings["API"] then
 	APITextbox:SetInput(Settings["API"])
-end
-
-if Settings["Blacklist"] then
-	updateParagraph(blacklisted, Settings["Blacklist"])
-end
-
-if Settings["Whitelist"] then
-	updateParagraph(whitelisted, Settings["Whitelist"])
-end
-
-if Settings["TargetBrainrots"] then
-	updateParagraph(targetedBrainrots, Settings["TargetBrainrots"])
-end
-
-if Settings["MutationTarget"] then
-	mutationTarget:SetInput(Settings["MutationTarget"])
 end
 
 if Settings["RegionPriority"] then
