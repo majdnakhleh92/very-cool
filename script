@@ -246,6 +246,45 @@ local function CameFromDuels(owner)
 	end
 end
 
+local function IsAvailable(animal)
+	local plot = animal.plot
+	if not plot then return false end
+	local slot = animal.slot
+	if not slot then return false end
+	
+	local function GetOverhead()
+		for _, part in workspace.Debris:GetChildren() do
+			local params = RaycastParams.new()
+			params.FilterType = Enum.RaycastFilterType.Exclude
+			params.FilterDescendantsInstances = {part}
+
+			local raycast = workspace:Raycast(part.Position, Vector3.new(0, -100, 0), params)
+			if raycast and raycast.Instance then
+
+				for _, Plot in workspace.Plots:GetChildren() do
+					if raycast.Instance:IsDescendantOf(Plot) and Plot==plot then
+						for i, v in Plot.AnimalPodiums:GetChildren() do
+							if raycast.Instance:IsDescendantOf(v) and i==slot then
+								return part:FindFirstChild("AnimalOverhead")
+							end
+						end
+					end
+				end
+			else 
+				return nil
+			end
+		end
+	end
+	
+	local overhead = GetOverhead()
+	if not overhead then return false end
+	local Stolen = overhead:FindFirstChild("Stolen")
+	
+	local illegalNames = {"IN DUEL", "FUSING", "READY!", "CRAFTING"}
+	if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then return false end
+	return true
+end
+
 local function FormatPets(petInfo)
 	local formatted = {}
 
@@ -339,7 +378,7 @@ local function GetAnimals()
 				local Traits = podium.Traits or "None"
 				local genValue = AnimalsShared:GetGeneration(aName, podium.Mutation, podium.Traits, nil)
 				local genText = "$"..NumberUtils:ToString(genValue).."/s"
-
+				
 				if not GetEntryPet(animals, aName) then 
 					table.insert(animals, {entryname=aName})
 				end
@@ -353,7 +392,8 @@ local function GetAnimals()
 							mutation = mutation,
 							traits = Traits,
 							owner = owner,
-							uid = workspacePlot.Name.."_"..tostring(slot)
+							slot = slot,
+							plot = workspacePlot,
 						})
 					end
 				end
@@ -384,9 +424,12 @@ local function GetMostValuable()
 			local animal = pets[j]
 			local keep = false
 			
-			
 			if Settings["Blacklist"] and table.find(Settings["Blacklist"], animal.name) then
 				keep = false
+			elseif not IsAvailable(animal) then
+				keep = false
+			elseif Settings["Whitelist"] and table.find(Settings["Whitelist"], animal.name) then
+				keep = true
 			elseif animal.genValue and animal.genValue >= minimum then
 				keep = true
 			elseif Settings["SpecificatedPets"] then
@@ -407,8 +450,6 @@ local function GetMostValuable()
 						keep = true
 					end
 				end
-			elseif Settings["Whitelist"] and table.find(Settings["Whitelist"], animal.name) then
-				keep = true
 			end
 
 			if not keep then
