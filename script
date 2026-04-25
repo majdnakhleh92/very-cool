@@ -343,6 +343,10 @@ local function DiscordNotification(tbl)
 	embed1.addField(CameFromDuels(tbl[1][1].owner), "", false)
 	embed1.addField("Serverhop Count", tostring(Settings["Server Count"]))
 	myMessage.sendMessage()
+	
+	Settings["Server Count"] = 0
+	SaveSettings()
+	
 	return
 end
 
