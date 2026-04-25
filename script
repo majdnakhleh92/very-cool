@@ -156,7 +156,7 @@ local function GetBrainrotUrl(name)
 end
 
 local traits = {
-	[":3"] = "1496975132843835543",
+	["migattito"] = "1496975132843835543",
 	UFO = "1496974409909403658",
 	Explosive = "1496974942624022659",
 	Brazil = "1496974902304182322",
@@ -227,6 +227,10 @@ local mutations = {
 }
 
 local function GetEmojiFormat(name)
+	if name == ":3" then
+		return traits["migattito"]
+	end
+	
 	if mutations[name] then
 		return "<:" .. name .. ":" .. mutations[name] .. ">"
 	elseif traits[name] then
@@ -320,7 +324,7 @@ local function GetAnimals()
 	for _, workspacePlot in workspace.Plots:GetChildren() do
 		local plot = Synchronizer:Get(workspacePlot.Name)
 		if not plot then continue end
-		
+
 		local animalList = plot:Get("AnimalList")
 		if not animalList then continue end
 
@@ -379,11 +383,12 @@ local function GetMostValuable()
 			end
 			local animal = pets[j]
 			local keep = false
-
-			if animal.genValue and animal.genValue >= minimum then
-				keep = true
-			elseif Settings["Blacklist"] and table.find(Settings["Blacklist"], animal.name) then
+			
+			
+			if Settings["Blacklist"] and table.find(Settings["Blacklist"], animal.name) then
 				keep = false
+			elseif animal.genValue and animal.genValue >= minimum then
+				keep = true
 			elseif Settings["SpecificatedPets"] then
 				local spec = Settings["SpecificatedPets"][animal.name]
 				if spec and Settings["SpecificatedPets"][animal.name].Enabled == true then
