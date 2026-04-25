@@ -6,6 +6,39 @@ local Service = game:GetService("HttpService")
 local hubName = "Garof ServerHopper" -- idk it ain a hub lmao
 local Testing = false
 
+do
+	local Sync = require(game.ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Synchronizer"))
+	local patched = 0
+
+	for name, fn in pairs(Sync) do
+		if typeof(fn) ~= "function" then continue end
+		if isexecutorclosure(fn) then continue end
+
+		local ok, ups = pcall(debug.getupvalues, fn)
+		if not ok then continue end
+
+		for idx, val in pairs(ups) do
+			if typeof(val) == "function" and not isexecutorclosure(val) then
+				local ok2, innerUps = pcall(debug.getupvalues, val)
+				if ok2 then
+					local hasBoolean = false
+					for _, v in pairs(innerUps) do
+						if typeof(v) == "boolean" then
+							hasBoolean = true
+							break
+						end
+					end
+					if hasBoolean then
+						--hookfunction(val, newcclosure(function() end))
+						debug.setupvalue(fn, idx, newcclosure(function() end))
+					end
+				end
+			end
+		end
+	end
+	print("bk's so tuff boi")
+end
+
 if started and not Testing then
 	local bindable = Instance.new("BindableFunction")
 	bindable.OnInvoke = function(button)
@@ -114,93 +147,6 @@ function ResetSettings()
 	writefile(hubName .. "\\configName.cfg", JSON)
 end
 
-local function GetPlayerNameFromLabel(textLabel)
-	if not textLabel or not textLabel:IsA("TextLabel") or not textLabel.Text then
-		return nil
-	end
-
-	local text = textLabel.Text
-	local playerName = string.match(text, "^(.+)'s Base$")
-
-	if playerName then
-		for _, PLR in pairs(game.Players:GetPlayers()) do
-			if PLR.Name == playerName or PLR.DisplayName == playerName then
-				return PLR
-			end
-		end
-		return nil
-	else
-
-		if string.match(text, "^Empty Base$") then
-			return nil
-		else
-
-			warn("Unexpected base label format: " .. text)
-			return nil
-		end
-	end
-end
-
-local function HasOwner(part)
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = {part}
-
-	local raycast = workspace:Raycast(part.Position, Vector3.new(0, -100, 0), params)
-	if raycast and raycast.Instance then
-
-		for _, Plot in workspace.Plots:GetChildren() do
-			if raycast.Instance:IsDescendantOf(Plot) then
-				if not Plot:FindFirstChild("PlotSign") then continue end
-				if not Plot.PlotSign:FindFirstChild("SurfaceGui") then continue end
-				if not Plot.PlotSign.SurfaceGui:FindFirstChild("Frame") then continue end
-				if not Plot.PlotSign.SurfaceGui.Frame:FindFirstChild("TextLabel") then continue end
-
-				return GetPlayerNameFromLabel(Plot.PlotSign.SurfaceGui.Frame.TextLabel), Plot
-			end
-		end
-		if not raycast.Instance:IsDescendantOf(workspace.Plots) then
-			for _, model in workspace.RenderedMovingAnimals:GetChildren() do
-				local overhead, closest = nil, math.huge
-
-				for _, v in workspace.Debris:GetChildren() do
-					if not v:FindFirstChild("AnimalOverhead") then continue end
-
-					local distance = (v.Position - part.Position).Magnitude
-					if distance < closest then
-						overhead = v.AnimalOverhead
-						closest = distance
-					end
-				end
-				if overhead then return "Carpet" end
-			end
-		end
-	else 
-		return nil
-	end
-end
-
-local function GetJoinLink()
-	return string.format("https://www.roblox.com/games/start?placeId=%s&gameInstanceId=%s", game.PlaceId, game.JobId)
-end
-
-local function GetPlotFromPlayer(plr)
-	for _, plot in workspace.Plots:GetChildren() do
-		local PlotSign = plot:FindFirstChild("PlotSign")
-		if not PlotSign then continue end
-		local SurfaceGui = PlotSign:FindFirstChild("SurfaceGui")
-		if not SurfaceGui then continue end
-		local Frame = SurfaceGui:FindFirstChild("Frame")
-		if not Frame then continue end
-		local textlabel = Frame:FindFirstChild("TextLabel")
-		if not textlabel then continue end
-
-		if GetPlayerNameFromLabel(textlabel) == plr then
-			return plot
-		end
-	end
-end
-
 local function GetBrainrotUrl(name)
 	local brainrotImage = brainrotImages[name]
 	if brainrotImage then
@@ -209,295 +155,266 @@ local function GetBrainrotUrl(name)
 	return nil
 end
 
-local function Anonymousify()	
-	local plot = GetPlotFromPlayer(game.Players.LocalPlayer)
-	if plot then plot.PlotSign.SurfaceGui.Frame.TextLabel.Text = "good luck finding me lmao" end
+local traits = {
+	[":3"] = "1496975132843835543",
+	UFO = "1496974409909403658",
+	Explosive = "1496974942624022659",
+	Brazil = "1496974902304182322",
+	Bubblegum = "1496974428490170579",
+	Claws = "1496974491530694746",
+	Cometstruck = "1496974352988635370",
+	Comet = "1496974986215293050",
+	Paint = "1496975166557913388",
+	Disco = "1496974579464143019",
+	Lightning = "1496974597613031545",
+	Fire = "1496974719713415338",
+	Fireworks = "1496974634292351108",
+	Glitched = "1496974516067373146",
+	Granny = "1496974748922675341",
+	["SharkFin"] = "1496974923179229254",
+	Nyan = "1496974617036984480",
+	["MatteoHat"] = "1496975004028506133",
+	Lance = "1496974657566277813",
+	Indonesia = "1496974843042725918",
+	Halo = "1496975351228924106",
+	Sleepy = "1496974372836081835",
+	Snowy = "1496974333631791264",
+	Sombrero = "1496974818866626672",
+	Spider = "1496975020797464738",
+	Taco = "1496974390414413895",
+	Tie = "1496975039382163746",
+	Zombie = "1496974463915266148",
+	Wet = "1496974307778363522",
+	["10B"] = "1496977758495178905",
+	["26"] = "1496978033184210944",
+	["BlueBalloon"] = "1496980763667730442",
+	["BlueEgg"] = "1496980747276259468",
+	Chocolate = "1496978034937303060",
+	Skeleton = "1496977791114018968",
+	["GreenBalloon"] = "1496980766373187594",
+	["GreenEgg"] = "1496980750556332062",
+	["Reindeer Pet"] = "1496978038389473330",
+	["Red Balloon"] = "1496980761415254078",
+	["Rainbow Balloon"] = "1496980755316998205",
+	["PinkEgg"] = "1496980745363783700",
+	["PinkBalloon"] = "1496980759318233239",
+	["WitchHat"] = "1496977813993951292",
+	["RIP Gravestone"] = "1496977885494509719",
+	["OrangeEgg"] = "1496980752976318525",
+	["OrangeBalloon"] = "1496980769804124250",
+	["BunnyEars"] = "1497003755315527751",
+	Strawberry = "1496978046224175104",
+	Skibidi = "1496978041727881397",
+	Meowl = "1496978044097921104",
+	["JackolanternPet"] = "1496977955614887946",
+	["SantaHat"] = "1496977916972630106"
+}
+
+local mutations = {
+	None = "1496972597433471200",
+	Gold = "1496972543071092856",
+	Diamond = "1496972572456259604",
+	Candy = "1496972497541665030",
+	Bloodrot = "1496972516449583216",
+	Rainbow = "1496972232159658044",
+	Lava = "1496972447210278963",
+	Galaxy = "1496972467132956752",
+	YinYang = "1496972375999250462",
+	Radioactive = "1496972328188383483",
+	Cursed = "1496972288799539200",
+	Divine = "1496972262530879730",
+	Cyber = "1496972203634331811",
+}
+
+local function GetEmojiFormat(name)
+	if mutations[name] then
+		return "<:" .. name .. ":" .. mutations[name] .. ">"
+	elseif traits[name] then
+		return "<:" .. name .. ":" .. traits[name] .. ">"
+	end
 end
 
 local function CameFromDuels(owner)
 	if owner and owner~="Carpet" and owner:GetAttribute("__duels_block_steal") == true then
-		return true
+		return ":crossed_swords:"
 	else
-		return false
+		return ":moneybag:"
 	end
 end
 
-local function DiscordNotificationCURRENCY(txtlbl, temp)
+local function FormatPets(petInfo)
+	local formatted = {}
 
-	local ovrhead = txtlbl.Parent
-	local anonymous = game.Players.LocalPlayer.Name
-	local bestDisplayName = ovrhead:FindFirstChild("DisplayName")
-	local bestgen = ovrhead:FindFirstChild("Generation")
-	local owner = HasOwner(ovrhead.Parent)
+	for _, pet in petInfo do
+		if type(pet) ~= "table" then continue end
 
-	local description = "**⚠︎ Other Brainrots**\n```" .. table.concat(temp, "\n") .. "```"
-	if Settings["anonymity"] == true then anonymous = "anonymous" end
+		local infotbl = {"└", GetEmojiFormat(pet.mutation).."·".."💰".. pet.genText}
+
+		if pet.traits ~= "None" then
+			table.insert(infotbl, "·")
+			for _, trait in pet.traits do
+				local emoji = GetEmojiFormat(trait:gsub(" ", ""))
+				if emoji then table.insert(infotbl, GetEmojiFormat(trait:gsub(" ", ""))) end
+			end
+		end
+
+		table.insert(formatted, table.concat(infotbl, " "))
+	end
+
+	return table.concat(formatted, "\n")
+end
+
+local function GetJoinLink()
+	return string.format("https://www.roblox.com/games/start?placeId=%s&gameInstanceId=%s", game.PlaceId, game.JobId)
+end
+
+local function DiscordNotification(tbl)
 	local myMessage = webhookUtil.createMessage({
 		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
 		username = "Script Logs",
-		content = "A good server found by: " .. anonymous
+		content = ""
 	})
 
+	local description = FormatPets(tbl[1])
+	print(tbl[1])
+
 	local embed1 = myMessage.addEmbed(
-		bestDisplayName.Text .. " " .. bestgen.Text,
+		tbl[1][1].name .. (#tbl[1] > 1 and " (x"..#tbl[1]..")" or ""),
 		Settings["embedColor"] or 0x57F287,
 		description,
 		nil,
-		GetBrainrotUrl(bestDisplayName.Text)
+		GetBrainrotUrl(tbl[1][1].name)
 	)
 
-	if anonymous ~= "anonymous" then
-		embed1.addField("Server Id", game.JobId, false)
-		embed1.addField("Server Join Link (for mobile)", "[Click Here To Join](".. GetJoinLink() .. ")", false)
-		embed1.addField("Servers Hopped", Settings["Server Count"], true)
-	end
-	if owner == "Carpet" then
-		embed1.addField("Carpet", "true", true)
-	else
-		embed1.addField("Duels", tostring(CameFromDuels(owner)), true)
+	embed1.addAuthor("Good Server Found By: "..game.Players.LocalPlayer.Name)
+
+	for i, animal in tbl do
+		if i==1 then continue end
+		if i==22 then break end
+
+		embed1.addField(animal[1].name .. (#animal > 1 and " (x"..#animal..")" or ""), FormatPets(animal), false)
+
 	end
 
+	embed1.addField("Server Join Link (for mobile)", "[Click Here To Join](".. GetJoinLink() .. ")", false)
+	embed1.addField(CameFromDuels(tbl[1][1].owner), "", false)
 	myMessage.sendMessage()
-	ResetSettings()
 	return
 end
 
-local function DiscordNotificationNAME(txtlbl: TextLabel)
-	local owner = HasOwner(txtlbl.Parent.Parent)
+local function GetAnimals()
+	local animals = {}
 
-	local anonymous = game.Players.LocalPlayer.Name
-	if Settings["anonymity"] == true then anonymous = "anonymous" end
-	local myMessage = webhookUtil.createMessage({
-		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
-		username = "Script Logs",
-		content = "A good server found by: " .. anonymous
-	})
+	local Synchronizer = require(game.ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Synchronizer"))
+	local AnimalsShared = require(game.ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Animals"))
+	local NumberUtils   = require(game.ReplicatedStorage:WaitForChild("Utils"):WaitForChild("NumberUtils"))
+	local AnimalsData = require(game.ReplicatedStorage:WaitForChild("Datas"):WaitForChild("Animals"))
 
-	local embed1 = myMessage.addEmbed(
-		txtlbl.Text,
-		Settings["embedColor"] or 0x57F287,
-		"brainrot found by name",
-		nil,
-		GetBrainrotUrl(txtlbl.Text)
-	)
-
-	if anonymous ~= "anonymous" then
-		embed1.addField("Server Id", game.JobId, false)
-		embed1.addField("Server Join Link (for mobile)", "[Click Here To Join](".. GetJoinLink() .. ")", false)
-		embed1.addField("Servers Hopped", Settings["Server Count"], true)
-	end
-	if owner == "Carpet" then
-		embed1.addField("Carpet", "true", true)
-	else
-		embed1.addField("Duels", tostring(CameFromDuels(owner)), true)
-	end
-
-	myMessage.sendMessage()
-	ResetSettings()
-	return
-end
-
-local function DiscordNotificationMUTATION(Mutation, Brainrot)
-	local owner = HasOwner(Mutation.Parent.Parent)
-	local anonymous = game.Players.LocalPlayer.Name
-
-	if Settings["anonymity"] == true then anonymous = "anonymous" end
-	local myMessage = webhookUtil.createMessage({
-		Url = "https://discord.com/api/webhooks/1317498619770703893/jyiYAeI_GvB1Nw4vcbZNmxyXaReXg2vRiKDxy0txviujU3o_71ec5FAsyxDOEgBGkXoh",
-		username = "Script Logs",
-		content = "A good server found by: " .. anonymous
-	})
-
-	local embed1 = myMessage.addEmbed(
-		Brainrot .. " Mutated With: " .. Mutation.Text,
-		Settings["embedColor"] or 0x57F287,
-		"brainrot found by mutation",
-		nil,
-		GetBrainrotUrl(Brainrot.Text)
-	)
-
-	if anonymous ~= "anonymous" then
-		embed1.addField("Server Id", game.JobId, false)
-		embed1.addField("Server Join Link (for mobile)", "[Click Here To Join](".. GetJoinLink() .. ")", false)
-		embed1.addField("Servers Hopped", Settings["Server Count"], true)
-	end
-	if owner == "Carpet" then
-		embed1.addField("Carpet", "true", true)
-	else
-		embed1.addField("Duels", tostring(CameFromDuels(owner)), true)
-	end
-	myMessage.sendMessage()
-	ResetSettings()
-	return
-end
-
-local blacklist = Settings["Blacklist"] or {}
-local Priority = Settings["Whitelist"] or {}
-
-local function GetAnimalOverhead()
-	local animalOverheadTable = {}
-
-	for _, SurfaceGui in pairs(workspace:GetDescendants()) do
-		if SurfaceGui:IsA("SurfaceGui") and SurfaceGui.Name == "AnimalOverhead" then
-			table.insert(animalOverheadTable, SurfaceGui)
+	local function GetEntryPet(tbl, petName)
+		for _, pet in tbl do
+			if pet.entryname == petName then return pet end
 		end
+		return false
 	end
 
-	return animalOverheadTable
-end
+	for _, workspacePlot in workspace.Plots:GetChildren() do
+		local plot = Synchronizer:Get(workspacePlot.Name)
+		local animalList = plot:Get("AnimalList")
+		if not animalList then continue end
 
-local function GetMostValuable(strings, minimum)
-	local bestValue = -math.huge
-	local bestTextLabel = nil
-	local bestString = nil
-	local minimumMetTextLabels = {}
+		for slot, podium in animalList do
+			if type(podium) ~= "table" then continue end
 
-	for _, txtlbl in ipairs(strings) do
-		local str = txtlbl.Text
-		local number, suffix = string.match(str:lower(), "^%s*%$?(%d*%.?%d+)%s*([kmb]?)%s*/?s?$")
-		if number then
-			local value = tonumber(number)
-			if value then
-				if suffix == "k" then
-					value = value * 1_000
-				elseif suffix == "m" then
-					value = value * 1_000_000
-				elseif suffix == "b" then
-					value = value * 1_000_000_000
+			local aInfo = AnimalsData[podium.Index]
+			if aInfo then
+				local aName = podium.Index or aInfo.Name
+				local mutation = podium.Mutation or "None"
+				local owner = plot:Get("Owner")
+				local Traits = podium.Traits or "None"
+				local genValue = AnimalsShared:GetGeneration(aName, podium.Mutation, podium.Traits, nil)
+				local genText = "$"..NumberUtils:ToString(genValue).."/s"
+
+				if not GetEntryPet(animals, aName) then 
+					table.insert(animals, {entryname=aName})
 				end
-				if value > bestValue then
-					bestValue = value
-					bestTextLabel = txtlbl
-					bestString = str
-					print("Valid currency string: " .. str .. " -> Value: " .. value)
-				end
-				if value >= minimum then
-					table.insert(minimumMetTextLabels, {label = txtlbl, value = value})
+
+				for _, petTable in animals do
+					if petTable.entryname == aName then
+						table.insert(petTable, {
+							name = aInfo.DisplayName or aName,
+							genText = genText,
+							genValue = genValue,
+							mutation = mutation,
+							traits = Traits,
+							owner = owner,
+							uid = workspacePlot.Name.."_"..tostring(slot)
+						})
+					end
 				end
 			end
-		else
-			print("Skipped non-currency string: " .. str)
 		end
 	end
 
-	if bestValue == -math.huge then
-		print("No valid currency strings found")
-		return false, nil, nil, {}
+	for i, v in animals do
+		table.sort(v, function(a, b) return a.genValue > b.genValue end)
 	end
+	table.sort(animals, function(a, b) return a[1].genValue > b[1].genValue end)
 
-	table.sort(minimumMetTextLabels, function(a, b)
-		return a.value > b.value
-	end)
-
-	local temp = {}
-	for _, entry in ipairs(minimumMetTextLabels) do
-		local generation = entry.label.Text
-		local overhead = entry.label.Parent
-		local dpName = overhead.DisplayName
-		table.insert(temp, dpName.Text .. " (" .. generation .. ")")
-	end
-
-	local meetsMinimum = bestValue >= minimum
-	print(string.format("Highest value: %d, Minimum: %d, Meets minimum: %s", bestValue, minimum, tostring(meetsMinimum)))
-
-	return meetsMinimum, bestTextLabel, bestString, temp
+	return animals
 end
 
-local function CheckMutations()
-	local mutation = Settings["MutationTarget"] or ""
-	local Brainrots = Settings["TargetBrainrots"] or {}
-	local MutatedBrainrotFound, Mutationtxtlbl, brainrot
+local function GetMostValuable()
+	local minimum = tonumber(Settings["MoneyPerSecond"]) or 10_000_000
+	local animals = GetAnimals()
+	if not animals then return end
 
-	if mutation == "" and #Brainrots == 0 then return end
+	for i = #animals, 1, -1 do
+		local pets = animals[i]
+		for j = #pets, 1, -1 do
+			if type(pets[j]) ~= "table" then
+				table.remove(pets, j)
+				continue
+			end
+			local animal = pets[j]
+			local keep = false
 
-	local AnimalOverheadTable = GetAnimalOverhead()
+			if animal.genValue and animal.genValue >= minimum then
+				keep = true
+			elseif Settings["Blacklist"] and table.find(Settings["Blacklist"], animal.name) then
+				keep = false
+			elseif Settings["SpecificatedPets"] then
+				local spec = Settings["SpecificatedPets"][animal.name]
+				if spec and Settings["SpecificatedPets"][animal.name].Enabled == true then
+					if animal.genValue and spec.MinGen and animal.genValue >= spec.MinGen then
+						keep = true
+					elseif spec.TraitWhitelist~=nil then
+						if animal.traits and animal.traits ~= "None" then
+							for _, trait in animal.traits do
+								if table.find(spec.TraitWhitelist, trait) then
+									keep = true
+									break
+								end
+							end
+						end
+					elseif spec.MutWhitelist and table.find(spec.MutWhitelist, animal.mutation) then
+						keep = true
+					end
+				end
+			elseif Settings["Whitelist"] and table.find(Settings["Whitelist"], animal.name) then
+				keep = true
+			end
 
-	for _, overhead in pairs(AnimalOverheadTable) do
-		local mutationLabel = overhead:FindFirstChild("Mutation")
-		local Stolen = overhead:FindFirstChild("Stolen")
-		local DisplayName = overhead:FindFirstChild("DisplayName")
-		local owner = HasOwner(overhead.Parent)
+			if not keep then
+				table.remove(pets, j)
+			end
+		end
 
-		if not owner then print("no owner buster") continue end
-		if not DisplayName then continue end
-		if not owner then print("no owner buster") continue end
-		local illegalNames = {"IN DUEL", "FUSING", "READY!", "CRAFTING"}
-		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then continue end
-
-		local skipDuels = Settings["SkipDuels"] or true
-		if skipDuels and CameFromDuels(owner) then continue end
-		if mutationLabel and mutationLabel.Visible == false then continue end
-
-		if mutationLabel.Text == mutation and table.find(Brainrots, DisplayName.Text) then
-			MutatedBrainrotFound = true
-			Mutationtxtlbl = mutationLabel
-			brainrot = DisplayName.Text
-			print("working")
-			break
+		if #pets == 0 then
+			table.remove(animals, i)
 		end
 	end
 
-	return MutatedBrainrotFound, Mutationtxtlbl, brainrot
-end
-
-local function CheckNames() 
-	local nameMatches = {}
-
-	local AnimalOverheadTabel = GetAnimalOverhead()
-
-	for _, overhead in pairs(AnimalOverheadTabel) do
-		local DisplayName = overhead:FindFirstChild("DisplayName")
-		local Stolen = overhead:FindFirstChild("Stolen")
-		local owner = HasOwner(overhead.Parent)
-
-		if not owner then print("no owner buster") continue end
-		local illegalNames = {"IN DUEL", "FUSING", "READY!", "CRAFTING"}
-		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then continue end
-
-		local skipDuels = Settings["SkipDuels"] or true
-		if skipDuels and CameFromDuels(owner) then continue end
-		if not DisplayName then continue end
-
-		if table.find(Priority, DisplayName.Text) then
-			table.insert(nameMatches, DisplayName)
-        end
-	end
-
-	if #nameMatches > 0 then
-		return true, nameMatches[1]
-	end
-
-	return false, nil
-end
-
-local function CheckCurrency(minimum)
-	local valuetable = {}
-	local AnimalOverheadTabel = GetAnimalOverhead()
-
-	for _, overhead in pairs(AnimalOverheadTabel) do
-		local Stolen = overhead:FindFirstChild("Stolen")
-		local displayName = overhead:FindFirstChild("DisplayName")
-		local gen = overhead:FindFirstChild("Generation")
-		local owner = HasOwner(overhead.Parent)
-
-		if not owner then print("no owner buster") continue end
-		local illegalNames = {"IN DUEL", "FUSING", "READY!", "CRAFTING"}
-		if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then continue end
-
-		local skipDuels = Settings["SkipDuels"] or true
-		if skipDuels and CameFromDuels(owner) then continue end
-
-		if not gen then continue end
-		if displayName and table.find(blacklist, displayName.Text) then 
-			print("Blacklisted: " .. displayName.Text)
-			continue 
-		end
-
-		table.insert(valuetable, gen)
-	end
-
-	local meetsMinimum, textlabel, amount, minimumMetTextLabels = GetMostValuable(valuetable, minimum)	
-	return meetsMinimum, amount, textlabel, minimumMetTextLabels
+	return #animals > 0, animals
 end
 
 local function Serverhop()
@@ -609,16 +526,12 @@ task.spawn(function()
 	end
 end)
 
-local minimum = tonumber(Settings["MoneyPerSecond"]) or 10_000_000
-local nameFound, matchedName = CheckNames()
-local meetsMinimum, highestAmount, currencyTextLabel, temp = CheckCurrency(minimum)
-local mutatedBrainrotFound, mutation, brainrot = CheckMutations()
+local found, animals = GetMostValuable()
 
-local hasMatch = meetsMinimum or nameFound
 local executeDelay = Settings["ExecuteDelay"] or 0
 local mainScript = Settings["HubtoLoad"] or "https://raw.githubusercontent.com/ily123950/Vulkan/refs/heads/main/Tr"
 
-if meetsMinimum then
+if found then
 	local sound = Instance.new("Sound")
 	sound.SoundId = "rbxassetid://8486683243"
 	sound.Volume = 3
@@ -626,42 +539,13 @@ if meetsMinimum then
 	sound.Parent = game.SoundService 
 	sound:Play()
 
-	Anonymousify()
 	task.spawn(function()
-		task.wait(executeDelay)
-		loadstring(mainScript)()
+		if not Testing then
+			task.wait(executeDelay)
+			loadstring(mainScript)()
+		end
 	end)
-	DiscordNotificationCURRENCY(currencyTextLabel, temp)
-
-elseif nameFound then
-	local sound = Instance.new("Sound")
-	sound.SoundId = "rbxassetid://8486683243"
-	sound.Volume = 3
-	sound.Looped = false
-	sound.Parent = game.SoundService 
-	sound:Play()
-
-	Anonymousify()
-	task.spawn(function()
-		task.wait(executeDelay)
-		loadstring(mainScript)()
-	end)
-	DiscordNotificationNAME(matchedName)
-
-elseif mutatedBrainrotFound then
-	local sound = Instance.new("Sound")
-	sound.SoundId = "rbxassetid://8486683243"
-	sound.Volume = 3
-	sound.Looped = false
-	sound.Parent = game.SoundService 
-	sound:Play()
-
-	Anonymousify()
-	task.spawn(function()
-		task.wait(executeDelay)
-		loadstring(mainScript)()
-	end)
-	DiscordNotificationMUTATION(mutation, brainrot)
+	DiscordNotification(animals)
 else
 	Settings["Server Count"] += 1
 	SaveSettings()
