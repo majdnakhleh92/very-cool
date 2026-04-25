@@ -378,7 +378,7 @@ local function GetAnimals()
 				local Traits = podium.Traits or "None"
 				local genValue = AnimalsShared:GetGeneration(aName, podium.Mutation, podium.Traits, nil)
 				local genText = "$"..NumberUtils:ToString(genValue).."/s"
-				if CameFromDuels(owner) and Settings["SkipDuels"] then continue end
+				if CameFromDuels(owner)==true and Settings["SkipDuels"] then continue end
 
 				if not GetEntryPet(animals, aName) then 
 					table.insert(animals, {entryname=aName})
