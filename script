@@ -319,6 +319,8 @@ local function GetAnimals()
 
 	for _, workspacePlot in workspace.Plots:GetChildren() do
 		local plot = Synchronizer:Get(workspacePlot.Name)
+		if not plot then continue end
+		
 		local animalList = plot:Get("AnimalList")
 		if not animalList then continue end
 
