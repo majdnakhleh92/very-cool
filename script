@@ -296,7 +296,7 @@ local function DiscordNotification(tbl)
 
 	end
 
-	embed1.addField("Server Join Link (for mobile)", "[Click Here To Join](".. GetJoinLink() .. ")", false)
+	embed1.addField("Server Join Link (For Mobile)", "[Click Here To Join](".. GetJoinLink() .. ")", false)
 	embed1.addField(CameFromDuels(tbl[1][1].owner), "", false)
 	myMessage.sendMessage()
 	return
