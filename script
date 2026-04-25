@@ -230,7 +230,7 @@ local function GetEmojiFormat(name)
 	if name == ":3" then
 		return traits["migattito"]
 	end
-	
+
 	if mutations[name] then
 		return "<:" .. name .. ":" .. mutations[name] .. ">"
 	elseif traits[name] then
@@ -251,7 +251,7 @@ local function IsAvailable(animal)
 	if not plot then return false end
 	local slot = animal.slot
 	if not slot then return false end
-	
+
 	local function GetOverhead()
 		for _, part in workspace.Debris:GetChildren() do
 			local params = RaycastParams.new()
@@ -275,11 +275,11 @@ local function IsAvailable(animal)
 			end
 		end
 	end
-	
+
 	local overhead = GetOverhead()
 	if not overhead then return false end
 	local Stolen = overhead:FindFirstChild("Stolen")
-	
+
 	local illegalNames = {"IN DUEL", "FUSING", "READY!", "CRAFTING"}
 	if Stolen and table.find(illegalNames, Stolen.Text) and Stolen.Visible == true then return false end
 	return true
@@ -333,7 +333,7 @@ local function DiscordNotification(tbl)
 
 	for i, animal in tbl do
 		if i==1 then continue end
-		if i==22 then break end
+		if i==23 then break end
 
 		embed1.addField(animal[1].name .. (#animal > 1 and " (x"..#animal..")" or ""), FormatPets(animal), false)
 
@@ -341,6 +341,7 @@ local function DiscordNotification(tbl)
 
 	embed1.addField("Server Join Link (For Mobile)", "[Click Here To Join](".. GetJoinLink() .. ")", false)
 	embed1.addField(CameFromDuels(tbl[1][1].owner), "", false)
+	embed1.addField("Serverhop Count", tostring(Settings["Server Count"]))
 	myMessage.sendMessage()
 	return
 end
@@ -424,7 +425,7 @@ local function GetMostValuable()
 			end
 			local animal = pets[j]
 			local keep = false
-			
+
 			if Settings["Blacklist"] and table.find(Settings["Blacklist"], animal.name) then
 				keep = false
 			elseif Settings["Whitelist"] and table.find(Settings["Whitelist"], animal.name) then
