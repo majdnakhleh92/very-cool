@@ -426,8 +426,6 @@ local function GetMostValuable()
 			
 			if Settings["Blacklist"] and table.find(Settings["Blacklist"], animal.name) then
 				keep = false
-			elseif not IsAvailable(animal) then
-				keep = false
 			elseif Settings["Whitelist"] and table.find(Settings["Whitelist"], animal.name) then
 				keep = true
 			elseif animal.genValue and animal.genValue >= minimum then
