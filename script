@@ -343,10 +343,10 @@ local function DiscordNotification(tbl)
 	embed1.addField(CameFromDuels(tbl[1][1].owner), "", false)
 	embed1.addField("Serverhop Count", tostring(Settings["Server Count"]))
 	myMessage.sendMessage()
-	
+
 	Settings["Server Count"] = 0
 	SaveSettings()
-	
+
 	return
 end
 
@@ -439,10 +439,8 @@ local function GetMostValuable()
 				keep = true
 			elseif Settings["SpecificatedPets"] then
 				local spec = Settings["SpecificatedPets"][animal.name]
-				if spec and Settings["SpecificatedPets"][animal.name].Enabled == true then
-					if animal.genValue and spec.MinGen and animal.genValue >= spec.MinGen then
-						keep = true
-					elseif spec.TraitWhitelist~=nil then
+				if spec and Settings["SpecificatedPets"][animal.name].Enabled == true and animal.genValue and spec.MinGen and animal.genValue >= spec.MinGen then
+					if spec.TraitWhitelist~=nil then
 						if animal.traits and animal.traits ~= "None" then
 							for _, trait in animal.traits do
 								if table.find(spec.TraitWhitelist, trait) then
