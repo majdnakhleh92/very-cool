@@ -439,8 +439,21 @@ local function GetMostValuable()
 				keep = true
 			elseif Settings["SpecificatedPets"] then
 				local spec = Settings["SpecificatedPets"][animal.name]
-				if spec and Settings["SpecificatedPets"][animal.name].Enabled == true and animal.genValue and spec.MinGen and animal.genValue >= spec.MinGen then
-					if spec.TraitWhitelist~=nil then
+				if spec and Settings["SpecificatedPets"][animal.name].Enabled == true and animal.genValue and spec.MinGen and spec.MinGen>0 and animal.genValue >= spec.MinGen then
+					if spec.TraitWhitelist~=nil and #spec.TraitWhitelist>0 then
+						if animal.traits and animal.traits ~= "None" then
+							for _, trait in animal.traits do
+								if table.find(spec.TraitWhitelist, trait) then
+									keep = true
+									break
+								end
+							end
+						end
+					elseif spec.MutWhitelist and table.find(spec.MutWhitelist, animal.mutation) then
+						keep = true
+					end
+				elseif spec and Settings["SpecificatedPets"][animal.name].Enabled == true then
+					if spec.TraitWhitelist~=nil and #spec.TraitWhitelist>0 then
 						if animal.traits and animal.traits ~= "None" then
 							for _, trait in animal.traits do
 								if table.find(spec.TraitWhitelist, trait) then
