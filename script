@@ -156,7 +156,7 @@ local function GetBrainrotUrl(name)
 end
 
 local traits = {
-	["migattito"] = "1496975132843835543",
+	["migattito"] = "<:migattito:1496975132843835543>",
 	UFO = "1496974409909403658",
 	Explosive = "1496974942624022659",
 	Brazil = "1496974902304182322",
