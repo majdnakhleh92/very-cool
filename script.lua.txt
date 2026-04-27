@@ -337,6 +337,148 @@ local dropdown = configurations:Dropdown({
 		return cleanedItem or itemToClean
 	end
 })
+configurations:Divider()
+local label69 = configurations:Label("(OG) Find Brainrots By Mutation") 
+local pageAmount = configurations:Slider({
+	Name = "Amount Of Mutation Pages",
+	Min = 1,
+	Max = 12,
+	Callback = function(value): number
+		Settings["PageAmount"] = value
+	end,
+
+	DisabledText = "Hey you cant use this!",
+	DisplayAsPercent = false,
+	Default = Settings["PageAmount"] or 1,
+	DecimalPlace = 0
+})
+
+local function CreateMutationPage(i)
+	if i == 0 or i > 12 then return end
+	if not Settings["Mutations"] then
+		Settings["Mutations"] = {}
+		for j = 1, 12 do
+			table.insert(Settings["Mutations"], {})
+		end
+	end
+
+	local index = Settings["Mutations"][i]
+
+	configurations:Label("Mutation Page " .. i)
+
+	local targetMutation = ""
+
+	local function getMatchingBrainrots()
+		local result = {}
+		if targetMutation == "" then return result end
+		if not Settings["SpecificatedPets"] then return result end
+		for petName, petData in Settings["SpecificatedPets"] do
+			if type(petData) ~= "table" then continue end
+			if petData.MutWhitelist and table.find(petData.MutWhitelist, targetMutation) then
+				Settings["SpecificatedPets"][petName].Enabled = true
+				table.insert(result, petName)
+			end
+		end
+		return result
+	end
+
+	local targetedBrainrots = configurations:Paragraph({
+		Title = "Brainrots with this mutation (Page " .. i .. ")",
+		Body = "",
+	})
+
+	local mutationTarget = configurations:TextBox({
+		Name = "Target Mutation",
+		Callback = function(value)
+			index["MutationTarget"] = value
+			targetMutation = value
+			updateParagraph(targetedBrainrots, getMatchingBrainrots())
+		end,
+		OnlyNumbers = false,
+		OnLeave = true,
+		ClearTextOnFocus = false,
+		PlaceHolderText = "Cursed, Radioactive, etc"
+	})
+
+	local targetBrainrotTextbox = configurations:TextBox({
+		Name = "Target Brainrot",
+		Callback = function(value)
+			if targetMutation == "" then Notification("No Target Mutation!", "Please enter a target mutation first") return end
+			if not Settings["SpecificatedPets"] then Settings["SpecificatedPets"] = {} end
+
+			local trimmed = value:match("^%s*(.-)%s*$")
+			if trimmed == "" then return end
+
+			for entry in trimmed:gmatch("[^,]+") do
+				local cleaned = entry:match("^%s*(.-)%s*$")
+				if cleaned ~= "" then
+					if not Settings["SpecificatedPets"][cleaned] then
+						Settings["SpecificatedPets"][cleaned] = {}
+					end
+					local pet = Settings["SpecificatedPets"][cleaned]
+					pet.MutWhitelist = pet.MutWhitelist or {}
+
+					if not table.find(pet.MutWhitelist, targetMutation) then
+						table.insert(pet.MutWhitelist, targetMutation)
+						pet.Enabled = true
+						Notification("Brainrot included!", "[ " .. cleaned .. " ]")
+					else
+						Notification("Already included!", "[ " .. cleaned .. " ]")
+					end
+				end
+			end
+
+			updateParagraph(targetedBrainrots, getMatchingBrainrots())
+		end,
+		OnLeave = true,
+		PlaceHolderText = "Brainrot1 or brainrot1, brainrot2, etc"
+	})
+
+	local detargetTextbox = configurations:TextBox({
+		Name = "Detarget Brainrots",
+		Callback = function(value)
+			if targetMutation == "" then Notification("No Target Mutation!", "Please enter a target mutation first") return end
+			if not Settings["SpecificatedPets"] then return end
+
+			local trimmed = value:match("^%s*(.-)%s*$")
+			if trimmed == "" then return end
+
+			for entry in trimmed:gmatch("[^,]+") do
+				local cleaned = entry:match("^%s*(.-)%s*$")
+				if cleaned ~= "" then
+					local pet = Settings["SpecificatedPets"][cleaned]
+					if pet and pet.MutWhitelist then
+						local found = table.find(pet.MutWhitelist, targetMutation)
+						if found then
+							table.remove(pet.MutWhitelist, found)
+							Notification("Removed!", "[ " .. cleaned .. " ]")
+						else
+							Notification("Not in targeted brainrots!", "[ " .. cleaned .. " ]")
+						end
+					else
+						Notification("Not in targeted brainrots!", "[ " .. cleaned .. " ]")
+					end
+				end
+			end
+
+			updateParagraph(targetedBrainrots, getMatchingBrainrots())
+		end,
+		OnLeave = true,
+		PlaceHolderText = "Brainrot1 or brainrot1, brainrot2, etc"
+	})
+
+	if index["MutationTarget"] then
+		mutationTarget:SetInput(index["MutationTarget"])
+		targetMutation = index["MutationTarget"]
+		updateParagraph(targetedBrainrots, getMatchingBrainrots())
+	end
+
+	configurations:Divider()
+end
+
+for i=1,Settings["PageAmount"] or 1 do
+	CreateMutationPage(i)
+end
 
 configurations:Divider()
 local label17 = configurations:Label("Find brainrots by specifications (e.g mutations, traits, minimum value)") 
@@ -551,7 +693,7 @@ local APITextbox = advancedSettings:TextBox({
 	ClearTextOnFocus = false,
 })
 
--- // LOADING CONFIGURATIONS // --
+
 if Settings["HubtoLoad"] then
 	HubToLoad:SetInput(tostring(Settings["HubtoLoad"]))
 end
