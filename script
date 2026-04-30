@@ -384,7 +384,7 @@ local function GetAnimals()
 				local genValue = AnimalsShared:GetGeneration(aName, podium.Mutation, podium.Traits, nil)
 				local genText = "$"..NumberUtils:ToString(genValue).."/s"
 				if owner == game.Players.LocalPlayer then continue end
-				if CameFromDuels(owner)==true and Settings["SkipDuels"] then continue end
+				if CameFromDuels(owner)==true and Settings["SkipDuels"]==true then continue end
 
 				if not GetEntryPet(animals, aName) then 
 					table.insert(animals, {entryname=aName})
@@ -414,6 +414,66 @@ local function GetAnimals()
 	table.sort(animals, function(a, b) return a[1].genValue > b[1].genValue end)
 
 	return animals
+end
+
+local function CreateLine(petDatas)
+	local petData = petDatas[1][1]
+	if not petData then return end
+
+	local character = game.Players.LocalPlayer.Character
+	if not character or not character.Parent then return end
+	local hrp = character:FindFirstChild("HumanoidRootPart")
+	if not hrp or not hrp.Parent then return end
+
+	local Part = nil
+
+	for _, v in workspace.Debris:GetChildren() do
+		if not v:IsA("Part") then continue end
+
+		local overhead = v:FindFirstChild("AnimalOverhead")
+		if not overhead then continue end
+
+		local gen = overhead:FindFirstChild("Generation")
+		if not gen then continue end
+
+		local name = overhead:FindFirstChild("DisplayName")
+		if not name then continue end
+
+		if gen.Text == petData.genText and name.Text == petData.name then
+			Part = v
+			print("yessss")
+			break
+		end
+	end
+
+	local plotBeamAttachment0 = Instance.new("Attachment")
+	plotBeamAttachment0.Name = "PlotBeamAttach_Player"
+	plotBeamAttachment0.Position = Vector3.new(0, 0, 0)
+	plotBeamAttachment0.Parent = hrp
+
+	local plotBeamAttachment1 = Instance.new("Attachment")
+	plotBeamAttachment1.Name = "PlotBeamAttach_BR"
+	plotBeamAttachment1.Position = Vector3.new(0, -5, 0)
+	plotBeamAttachment1.Parent = Part
+
+	local plotBeam = Instance.new("Beam")
+	plotBeam.Name = "beamington"
+	plotBeam.Attachment0 = plotBeamAttachment0
+	plotBeam.Attachment1 = plotBeamAttachment1
+	plotBeam.FaceCamera = true
+	plotBeam.LightEmission = 1
+	plotBeam.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+	plotBeam.Transparency = NumberSequence.new(0)
+	plotBeam.Width0 = 0.7
+	plotBeam.Width1 = 0.7
+	plotBeam.TextureMode = Enum.TextureMode.Wrap
+	plotBeam.TextureSpeed = 0
+	plotBeam.Parent = hrp
+
+	local old; old = hookfunction(plotBeam.Destroy, function(self)
+		if self == plotBeam then return end
+		return old(self)
+	end)
 end
 
 local function GetMostValuable()
@@ -485,7 +545,7 @@ local function Serverhop()
 	local Tried
 	local HttpService, TeleportService, CoreGui = game:GetService("HttpService"), game:GetService("TeleportService"), game:GetService("CoreGui");
 	local RemoveErrorPrompts = Settings["RemoveErrorPrompts"] or true --prevents error messages from popping up.
-	local IterationSpeed = Settings["ServerhopSpeed"] or 0.30 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
+	local IterationSpeed = Settings["ServerhopSpeed"] or 0.25 --speed in which next server is picked for teleport (the higher it is the slower the teleports but more likely to work).
 	local ExcludefullServers = Settings["ExcludefullServers"] or false --slightly beneficial if the game is high ccu or mid ccu, if not, set to false.
 	local SaveTeleportAttempts = Settings["SaveTeleportAttempts"] or false --saves every teleports that are attempted in jobid to "Attempts.txt" file
 	local API = Settings["API"] or "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?limit=100"
@@ -602,7 +662,7 @@ if found then
 	sound.Looped = false
 	sound.Parent = game.SoundService 
 	sound:Play()
-
+	CreateLine(animals)
 	task.spawn(function()
 		if not Testing then
 			task.wait(executeDelay)
