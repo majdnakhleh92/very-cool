@@ -156,7 +156,7 @@ local function GetBrainrotUrl(name)
 end
 
 local traits = {
-	["migattito"] = "<:migattito:1496975132843835543>",
+	["John Pork"] = "1500897035367219210",
 	UFO = "1496974409909403658",
 	Explosive = "1496974942624022659",
 	Brazil = "1496974902304182322",
@@ -228,7 +228,7 @@ local mutations = {
 
 local function GetEmojiFormat(name)
 	if name == ":3" then
-		return traits["migattito"]
+		return "<:migattito:1496975132843835543>"
 	end
 
 	if mutations[name] then
