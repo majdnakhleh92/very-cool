@@ -671,6 +671,7 @@ if found then
 	end)
 	DiscordNotification(animals)
 else
+	task.wait(2)
 	Settings["Server Count"] += 1
 	SaveSettings()
 	Serverhop()
